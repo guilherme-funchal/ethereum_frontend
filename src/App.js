@@ -1,12 +1,11 @@
-import logo from './logo.svg';
 import './App.css';
 import Footer from './Footer';
 import { ethers } from 'ethers';
 import { useState, useEffect } from 'react';
 import api from './api';
 import { Modal, Button } from 'react-bootstrap/'
-
-
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 function App() {
 
@@ -43,16 +42,17 @@ function App() {
   const [timestamp, setTimestamp] = useState('');
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  // const handleShow = () => setShow(true);
   const handleTimestamp = () => setTimestamp(true);
-  const handleCloseTimestamp = () => setTimestamp(false);
-  
-  // async function doOwner(){
-  //   const response = api.get('dono');
-  //   var dono = (await response).data
-  //   console.log((await response).data);
-  //   alert(dono);
-  // }
+  // const handleCloseTimestamp = () => setTimestamp(false);
+  const MySwal = withReactContent(Swal)
+
+  async function doOwner(){
+    const response = api.get('dono');
+    var dono = (await response).data
+    console.log((await response).data);
+    return MySwal.fire(<p><h6><b>Proprietário :</b> {dono}</h6></p>)
+  }
 
   async function doSaldo(){
     var conta = localStorage.getItem('wallet');
@@ -68,7 +68,11 @@ function App() {
     var date = new Date(timestamp_result * 1000);
     var resultado = date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
     setTimestamp(resultado);
-    return timestamp_result;
+    return MySwal.fire(<p><h6><b>Timestamp do Bloco :</b> {resultado}</h6></p>)
+  }
+  
+  async function WalletAtual(){
+    return MySwal.fire(<p><h6><b>Wallet :</b> {wallet}</h6></p>)
   }
 
   async function doTransacoes(){
@@ -78,7 +82,7 @@ function App() {
   }
 
   async function doSignIn() {
-    // alert('Logado');
+  //   alert('Logado');
   // window.location.reload(false);
   }
   
@@ -94,17 +98,20 @@ function App() {
     setTransactions('');
     setBalance('');
     setTimestamp('');
+    window.location.reload(false);
   }
   
   async function doSignUp(){
     setError('');
   
-    if (!window.ethereum) return setError(`No MetaMask found!`);
+    // if (!window.ethereum) return setError(`No MetaMask found!`);
+    if (!window.ethereum) return MySwal.fire(<p><h6><b>Erro :</b>Carteira não encontrada</h6></p>);
   
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const accounts = await provider.send("eth_requestAccounts", []);
-      if (!accounts || !accounts.length) return setError('Wallet not found/allowed!');
+      // if (!accounts || !accounts.length) return setError('Wallet not found/allowed!');
+      if (!accounts || !accounts.length) return MySwal.fire(<p><h6><b>Erro :</b>Carteira não encontrada</h6></p>)
       localStorage.setItem('wallet', accounts[0]);
       window.location.reload(false);
     }catch(err){
@@ -119,18 +126,6 @@ function App() {
       <div>
         <nav className="main-header navbar navbar-expand navbar-white navbar-light navbar-right">
         <ul className="navbar-nav ml-auto">
-          {/* <ul className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUp}> 
-                <i className="fa fa-lock" />
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doLogout}> 
-                <i className="fa fa-unlock-alt" />
-              </a>
-            </li>
-          </ul> */}
                   {
                     
           !wallet
@@ -171,36 +166,15 @@ function App() {
             {/* Sidebar user panel (optional) */}
             <div className="user-panel mt-3 pb-3 mb-3 d-flex">
               <div className="info">
-                <p class="text-white">Carteira Metamask <button id="btn1" class="btn text-light" onClick={handleShow}><i className="fas fa fa-info" />
-</button></p>
+                <p class="text-white">Carteira Metamask <button id="btn1" class="btn text-light" onClick={WalletAtual}><i className="fas fa fa-info" />
+              </button>
+              <button id="btn2" class="btn text-light" onClick={doOwner}><i className="fas fa fa-university" /></button></p>
               </div>
             </div>
-            <Modal show={timestamp}>
-              <Modal.Header closeButton >
-                <Modal.Title>Timestamp</Modal.Title>
-              </Modal.Header>
-              <Modal.Body><center>{timestamp}</center></Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseTimestamp} > 
-                  Fechar
-                </Button>
-              </Modal.Footer>
-            </Modal>
-            <Modal show={show}>
-              <Modal.Header closeButton >
-                <Modal.Title>Informações</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>ID Carteira :{wallet}</Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose} > 
-                  Fechar
-                </Button>
-              </Modal.Footer>
-            </Modal>
             {/* Sidebar Menu */}
               <nav className="mt-2">
                 <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                  <li className="nav-item has-treeview menu-open">
+                  <li className="nav-item has-treeview">
                     <a href="#" className="nav-link active">
                       <i className="nav-icon fas fa fa-arrows-alt" />
                       <p>
@@ -208,7 +182,7 @@ function App() {
                       </p>
                     </a>
                   </li>
-                  <li className="nav-item has-treeview menu-open">
+                  <li className="nav-item has-treeview">
                     <a href="#" className="nav-link active">
                       <i className="nav-icon fas fa  fa-list-alt" />
                       <p>
@@ -216,7 +190,30 @@ function App() {
                       </p>
                     </a>
                   </li>
-                  <li className="nav-item has-treeview menu-open">
+                  <li className="nav-item has-treeview menu-close">
+                  <a href="#" className="nav-link active">
+                    <i className="nav-icon fas fa-tachometer-alt" />
+                    <p>
+                      Tokens
+                      <i className="right fas fa-angle-left" />
+                    </p>
+                  </a>
+                  <ul className="nav nav-treeview">
+                    <li className="nav-item">
+                      <a href="./index.html" className="nav-link active">
+                        <i className="far fa-circle nav-icon" />
+                        <p>Emitir</p>
+                      </a>
+                    </li>
+                    <li className="nav-item">
+                      <a href="./index2.html" className="nav-link">
+                        <i className="far fa-circle nav-icon" />
+                        <p>Queimar</p>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                  <li className="nav-item has-treeview">
                     <a href="#" className="nav-link active">
                       <i className="nav-icon fas fa  fa-user" />
                       <p>
@@ -224,7 +221,7 @@ function App() {
                       </p>
                     </a>
                   </li>
-                  <li className="nav-item has-treeview menu-open">
+                  <li className="nav-item has-treeview">
                     <a href="#" className="nav-link active" onClick={refreshPage}>
                       <i className="nav-icon fas fa fa-reply" />
                       <p>
@@ -253,10 +250,21 @@ function App() {
         <div className="container-fluid">
           <div className="row">
             <div className="col-lg-3 col-6">
-              <div className="small-box bg-info">
+              <div className="small-box bg-danger">
                 <div className="inner">
                   <h3>{balance}</h3>
-                  <p>Saldo</p>
+                  <p>Saldo Carbono</p>
+                </div>
+                <div className="icon">
+                  <i className="ion ion-bag" />
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-6">
+              <div className="small-box bg-info">
+                <div className="inner">
+                  <h3>0,00</h3>
+                  <p>Saldo Moeda</p>
                 </div>
                 <div className="icon">
                   <i className="ion ion-bag" />
