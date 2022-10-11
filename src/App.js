@@ -1,13 +1,17 @@
 import './App.css';
-import Footer from './Footer';
+import Footer from './components/Footer';
+import Web3 from 'web3';
+import Menu from './components/Menu'
 import { ethers } from 'ethers';
 import { useState, useEffect } from 'react';
 import api from './api';
-import { Modal, Button } from 'react-bootstrap/'
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
+import { Modal, Button } from 'react-bootstrap/';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+import { useDialog } from 'react-st-modal';
 
-function App() {
+
+export default function App() {
 
   useEffect(() => {
     const address = localStorage.getItem('wallet');
@@ -40,24 +44,33 @@ function App() {
   const [transactions, setTransactions] = useState(['']);
   const [balance, setBalance] = useState('');
   const [timestamp, setTimestamp] = useState('');
-  const [show, setShow] = useState(false);
+  const [showModalTransf, setShow] = useState(false);
+  const [showModalMint, setShowMint] = useState(false);
   const handleClose = () => setShow(false);
-  // const handleShow = () => setShow(true);
-  const handleTimestamp = () => setTimestamp(true);
-  // const handleCloseTimestamp = () => setTimestamp(false);
+  const handleShow = () => setShow(true);
+    const handleShowMint = () => setShowMint(true);
+  const handleCloseMint = () => setShowMint(false);
+  const handleTimestamp = () => setTimestamp(true); 
   const MySwal = withReactContent(Swal)
 
+  
   async function doOwner(){
     const response = api.get('dono');
     var dono = (await response).data
     console.log((await response).data);
-    return MySwal.fire(<p><h6><b>Proprietário :</b> {dono}</h6></p>)
+    MySwal.fire({
+      title: <strong>Proprietário</strong>,
+      html: <i>{dono}</i>,
+      icon: 'info'
+    })
   }
-
+  
   async function doSaldo(){
     var conta = localStorage.getItem('wallet');
     const response = api.get('saldo?conta=' + conta);
     var saldo = (await response).data;
+    saldo = parseFloat(saldo);
+    saldo = saldo.toLocaleString('pt-br', {minimumFractionDigits: 2});
     return saldo;
   }
 
@@ -68,11 +81,19 @@ function App() {
     var date = new Date(timestamp_result * 1000);
     var resultado = date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
     setTimestamp(resultado);
-    return MySwal.fire(<p><h6><b>Timestamp do Bloco :</b> {resultado}</h6></p>)
+    MySwal.fire({
+      title: <strong>Timestamp do Bloco</strong>,
+      html: <i>{resultado}</i>,
+      icon: 'info'
+    });
   }
   
   async function WalletAtual(){
-    return MySwal.fire(<p><h6><b>Wallet :</b> {wallet}</h6></p>)
+    MySwal.fire({
+      title: <strong>Wallet</strong>,
+      html: <i>{wallet}</i>,
+      icon: 'info'
+    });
   }
 
   async function doTransacoes(){
@@ -104,14 +125,12 @@ function App() {
   async function doSignUp(){
     setError('');
   
-    // if (!window.ethereum) return setError(`No MetaMask found!`);
-    if (!window.ethereum) return MySwal.fire(<p><h6><b>Erro :</b>Carteira não encontrada</h6></p>);
+    if (!window.ethereum) return MySwal.fire(<p><h6><b>Carteira não encontrada</b></h6></p>);
   
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const accounts = await provider.send("eth_requestAccounts", []);
-      // if (!accounts || !accounts.length) return setError('Wallet not found/allowed!');
-      if (!accounts || !accounts.length) return MySwal.fire(<p><h6><b>Erro :</b>Carteira não encontrada</h6></p>)
+      if (!accounts || !accounts.length) return MySwal.fire(<p><h6><b>Carteira não encontrada</b></h6></p>);
       localStorage.setItem('wallet', accounts[0]);
       window.location.reload(false);
     }catch(err){
@@ -120,7 +139,6 @@ function App() {
   }
   
   return (
-    
     <div class="wrapper">
       <header>
       <div>
@@ -171,71 +189,10 @@ function App() {
               <button id="btn2" class="btn text-light" onClick={doOwner}><i className="fas fa fa-university" /></button></p>
               </div>
             </div>
-            {/* Sidebar Menu */}
-              <nav className="mt-2">
-                <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                  <li className="nav-item has-treeview">
-                    <a href="#" className="nav-link active">
-                      <i className="nav-icon fas fa fa-arrows-alt" />
-                      <p>
-                        Transferências
-                      </p>
-                    </a>
-                  </li>
-                  <li className="nav-item has-treeview">
-                    <a href="#" className="nav-link active">
-                      <i className="nav-icon fas fa  fa-list-alt" />
-                      <p>
-                        Emissão
-                      </p>
-                    </a>
-                  </li>
-                  <li className="nav-item has-treeview menu-close">
-                  <a href="#" className="nav-link active">
-                    <i className="nav-icon fas fa-tachometer-alt" />
-                    <p>
-                      Tokens
-                      <i className="right fas fa-angle-left" />
-                    </p>
-                  </a>
-                  <ul className="nav nav-treeview">
-                    <li className="nav-item">
-                      <a href="./index.html" className="nav-link active">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Emitir</p>
-                      </a>
-                    </li>
-                    <li className="nav-item">
-                      <a href="./index2.html" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Queimar</p>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                  <li className="nav-item has-treeview">
-                    <a href="#" className="nav-link active">
-                      <i className="nav-icon fas fa  fa-user" />
-                      <p>
-                        Usuários
-                      </p>
-                    </a>
-                  </li>
-                  <li className="nav-item has-treeview">
-                    <a href="#" className="nav-link active" onClick={refreshPage}>
-                      <i className="nav-icon fas fa fa-reply" />
-                      <p>
-                        Atualizar Página
-                      </p>
-                    </a>
-                  </li>
-                </ul>
-                
-              </nav>
-            </div>
-          </aside>
-        </div>
-        <div>
+            <Menu handleShow={handleShow} handleShowMint={handleShowMint}/>
+            
+              </div>
+          </aside>     
     <div className="content-wrapper">
       <div className="content-header">
         <div className="container-fluid">
@@ -330,7 +287,10 @@ function App() {
                         to = `${val[key]}`;  
                       }
                       else if (key === "value") {
-                        value = `${val[key]}`;  
+                        value = `${val[key]}`;
+                        value = Web3.utils.fromWei(value, 'ether'); 
+                        value = parseFloat(value);
+                        value = value.toLocaleString('pt-br', {minimumFractionDigits: 2}); 
                       }  
                     } 
 
@@ -351,10 +311,45 @@ function App() {
         </div>
       </section>
     </div>
+    <Modal show={showModalTransf} onHide={handleClose}>
+        <Modal.Header>
+          <Modal.Title>Transferência</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+            Enviar
+          </Button>
+        </Modal.Footer>
+    </Modal>
+    <Modal show={showModalMint} onHide={handleCloseMint}>
+        <Modal.Header>
+          <Modal.Title>Emitir</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        <form>
+          <label>Valor:
+            <input type="text" />
+          </label>
+        </form> 
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseMint}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={handleCloseMint}>
+            Enviar
+          </Button>
+        </Modal.Footer>
+    </Modal>
   </div>
-      <Footer/>
-    </div>
+      <Footer wallet={wallet}/>
+  </div>
   );
 }
 
-export default App;
+
+// export default App;
