@@ -8,7 +8,8 @@ import api from './api';
 import { Modal, Button } from 'react-bootstrap/';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { useDialog } from 'react-st-modal';
+import Modal1 from "./components/modals/ModalToken";
+import Modal2 from "./components/modals/ModalTransfer";
 
 
 export default function App() {
@@ -16,11 +17,20 @@ export default function App() {
   useEffect(() => {
     const address = localStorage.getItem('wallet');
     setWallet(address);  
-    const saldo = doSaldo();
+    const moeda = doSaldoMoeda();
+    const carbono = doSaldoCarbono();
 
-    saldo
+    moeda
     .then((value) => {
-      setBalance(value);
+      setBalanceMoeda(value);
+    })
+    .catch((err) => {
+      console.log(err); 
+    });
+
+    carbono
+    .then((value) => {
+      setBalanceCarbono(value);
     })
     .catch((err) => {
       console.log(err); 
@@ -42,17 +52,25 @@ export default function App() {
   const [error, setError] = useState('');
   const [wallet, setWallet] = useState('');
   const [transactions, setTransactions] = useState(['']);
-  const [balance, setBalance] = useState('');
+  const [moeda, setBalanceMoeda] = useState('');
+  const [carbono, setBalanceCarbono] = useState('');
   const [timestamp, setTimestamp] = useState('');
   const [showModalTransf, setShow] = useState(false);
-  const [showModalMint, setShowMint] = useState(false);
+  // const [showModalMint, setShowMint] = useState(false);
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-    const handleShowMint = () => setShowMint(true);
-  const handleCloseMint = () => setShowMint(false);
+  // const handleShow = () => setShow(true);
+  // const handleShowMint = () => setShowMint(true);
+  // const handleCloseMint = () => setShowMint(false);
   const handleTimestamp = () => setTimestamp(true); 
   const MySwal = withReactContent(Swal)
 
+  //Show Modal Form
+  const [showModalToken, setShowModalToken] = useState(false);
+  const handleShowModalToken = () => setShowModalToken(true);
+  
+  const [showModalTransfer, setShowModalTransfer] = useState(false);
+  const handleShowModalTransfer = () => setShowModalTransfer(true);
+ 
   
   async function doOwner(){
     const response = api.get('dono');
@@ -65,13 +83,24 @@ export default function App() {
     })
   }
   
-  async function doSaldo(){
+  async function doSaldoCarbono(){
     var conta = localStorage.getItem('wallet');
-    const response = api.get('saldo?conta=' + conta);
-    var saldo = (await response).data;
-    saldo = parseFloat(saldo);
-    saldo = saldo.toLocaleString('pt-br', {minimumFractionDigits: 2});
-    return saldo;
+    var response = api.get('saldo?conta=' + conta + '&wallet=1');
+    var carbono = (await response).data;
+    carbono = parseFloat(carbono);
+    carbono = carbono.toLocaleString('pt-br', {minimumFractionDigits: 2});
+    console.log('carbono:' + carbono);
+    return carbono;
+  }
+
+  async function doSaldoMoeda(){
+    var conta = localStorage.getItem('wallet');
+    var response = api.get('saldo?conta=' + conta + '&wallet=0');
+    var moeda = (await response).data;
+    moeda = parseFloat(moeda);
+    moeda = moeda.toLocaleString('pt-br', {minimumFractionDigits: 2});
+    console.log('moeda:' + moeda)
+    return moeda;
   }
 
   async function doTimestamp(param){
@@ -117,7 +146,8 @@ export default function App() {
     setWallet('');
     setError('');
     setTransactions('');
-    setBalance('');
+    setBalanceCarbono('');
+    setBalanceMoeda('');
     setTimestamp('');
     window.location.reload(false);
   }
@@ -189,7 +219,8 @@ export default function App() {
               <button id="btn2" class="btn text-light" onClick={doOwner}><i className="fas fa fa-university" /></button></p>
               </div>
             </div>
-            <Menu handleShow={handleShow} handleShowMint={handleShowMint}/>
+            {/* <Menu handleShow={handleShow} handleShowMint={handleShowMint} handleShowModalToken={handleShowModalToken} handleShowModalTransfer={handleShowModalTransfer}/> */}
+            <Menu handleShowModalToken={handleShowModalToken} handleShowModalTransfer={handleShowModalTransfer}/>
             
               </div>
           </aside>     
@@ -209,7 +240,7 @@ export default function App() {
             <div className="col-lg-3 col-6">
               <div className="small-box bg-danger">
                 <div className="inner">
-                  <h3>{balance}</h3>
+                  <h3>{carbono}</h3>
                   <p>Saldo Carbono</p>
                 </div>
                 <div className="icon">
@@ -220,7 +251,7 @@ export default function App() {
             <div className="col-lg-3 col-6">
               <div className="small-box bg-info">
                 <div className="inner">
-                  <h3>0,00</h3>
+                  <h3>{moeda}</h3>
                   <p>Saldo Moeda</p>
                 </div>
                 <div className="icon">
@@ -275,16 +306,23 @@ export default function App() {
                     let to = ""
                     let operator = ""
                     let value = ""
-
+                    let transferencia = "Transferencia"
+                    
                     for (const key in val) {                    
                       if (key === "operator") {
                         operator = `${val[key]}`;  
                       }
                       else if (key === "from") {
-                        from = `${val[key]}`;  
+                        from = `${val[key]}`;
+                        if (from === "0x0000000000000000000000000000000000000000" && obj.event === "TransferSingle") {
+                          transferencia = "Cunhagem"; 
+                        }
                       }
                       else if (key === "to") {
-                        to = `${val[key]}`;  
+                        to = `${val[key]}`;
+                        if (to === "0x0000000000000000000000000000000000000000" && obj.event === "TransferSingle") {
+                          transferencia = "Queima"; 
+                        }  
                       }
                       else if (key === "value") {
                         value = `${val[key]}`;
@@ -297,13 +335,13 @@ export default function App() {
                     return (
 
                         <tr>
-                          <td>Transferência</td>
+                          <td>{transferencia}</td>
                           <td><center>{obj.blockNumber}</center></td> 
                           <td>{from}</td>   
                           <td>{to}</td>
                           <td><center>{value}</center></td>
                           <td><center><button class="btn text-red" onClick={event => { doTimestamp(obj.blockNumber); handleTimestamp();}}
-><i class="fas fa fa-info"></i></button></center></td>
+><i class="fas fa fa-clock"></i></button></center></td>
                         </tr>                         
                     );
                   })}
@@ -325,7 +363,7 @@ export default function App() {
           </Button>
         </Modal.Footer>
     </Modal>
-    <Modal show={showModalMint} onHide={handleCloseMint}>
+    {/* <Modal show={showModalMint} onHide={handleCloseMint}>
         <Modal.Header>
           <Modal.Title>Emitir</Modal.Title>
         </Modal.Header>
@@ -344,7 +382,12 @@ export default function App() {
             Enviar
           </Button>
         </Modal.Footer>
-    </Modal>
+    </Modal> */}
+    <Modal1 title="Token" onClose={() => setShowModalToken(false)} show={showModalToken}>
+    </Modal1>
+    <Modal2 title="Transferência" onClose={() => setShowModalTransfer(false)} show={showModalTransfer}>
+    </Modal2>                
+
   </div>
       <Footer wallet={wallet}/>
   </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { Alert } from 'react-st-modal';
+
 
 async function refreshPage() {
     await Toast.fire({
@@ -27,19 +27,19 @@ const Toast = Swal.mixin({
 const MySwal = withReactContent(Swal);
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default function Child( {handleShow, handleShowMint} ){
+export default function Child( {handleShow, handleShowMint, handleShowModalToken, handleShowModalTransfer} ){
   return (
     <div>  
         <nav className="mt-2">
                 <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                   <li className="nav-item has-treeview">
-                  <a className="nav-link active" onClick={handleShowMint}>
+                  <a className="nav-link active" onClick={handleShowModalToken}>
                     <i className="nav-icon fas fa-tachometer-alt" />
                     <p>
                       Tokens
                     </p>
                   </a>
-                    <a className="nav-link active" onClick={handleShow}>
+                    <a className="nav-link active" onClick={handleShowModalTransfer}>
                       <i className="nav-icon fas fa fa-arrows-alt" />
                       <p>
                         Transferências
