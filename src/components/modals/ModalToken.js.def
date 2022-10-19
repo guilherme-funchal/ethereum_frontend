@@ -1,0 +1,184 @@
+import React, { useReducer, useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
+import { CSSTransition } from "react-transition-group";
+import "./Modal.css";
+import { Form, Button, Row, Col } from "react-bootstrap";
+import api from '../../api';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+
+const Modal = props => {
+  const closeOnEscapeKeyDown = e => {
+    if ((e.charCode || e.keyCode) === 27) {
+      props.onClose();
+    }
+  };
+  
+  // const MySwal = withReactContent(Swal)
+  
+  const [inputs, setInputs] = useState({});
+  const [validated, setValidated] = useState(false);
+
+  const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setInputs(values => ({...values, [name]: value}))
+  }
+  
+  const reload=()=>window.location.reload();
+
+  const handleSubmit = (event) => {
+    const form = event.currentTarget;
+    var block = ""
+    var response = "";
+
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      Swal.fire('Campos vazios no formulário', '', 'error')
+    }
+      
+    if (form.checkValidity() === true) {
+      Swal.fire({
+        title: 'Você deseja realizar a operação?',
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: 'Sim',
+        denyButtonText: 'Não',
+        customClass: {
+          actions: 'my-actions',
+          cancelButton: 'order-1 right-gap',
+          confirmButton: 'order-2',
+          denyButton: 'order-3',
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire('Operação realizada', '', 'success')
+          props.onClose();
+      
+          if (inputs.op === '1') {
+            block = { 
+              "account": inputs.destino,
+              "id": inputs.id,
+              "amount": inputs.valor,
+              "data": "0x"
+            };
+            response = api.post('emitir', block);
+          }
+        
+          if (inputs.op === '0') {
+            block = { 
+              "account": inputs.destino,
+              "id": inputs.id,
+              "value": inputs.valor
+            };
+            response = api.post('queimar', block);
+            
+          }
+
+        } else if (result.isDenied) {
+          Swal.fire('Operação não realizada', '', 'info')
+        }
+      })
+    }  
+    // console.log(response); 
+    // reload();
+    setValidated(false);
+
+  }
+  
+  useEffect(() => {
+
+    document.body.addEventListener("keydown", closeOnEscapeKeyDown);
+
+    return function cleanup() {
+      document.body.removeEventListener("keydown", closeOnEscapeKeyDown);
+    };
+  }, []);
+
+  return ReactDOM.createPortal(
+    <CSSTransition
+      in={props.show}
+      unmountOnExit
+      timeout={{ enter: 0, exit: 600 }}
+    >
+    <div className="modal" onClick={props.onClose}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h4 className="modal-title">{props.title}</h4>
+          </div>
+          <div className="modal-body">
+          <form noValidate validated={validated} id="token" onSubmit={handleSubmit}>  
+          <Row>        
+          <Col xs={5}>
+          {/* <Form.Control type="text" required isInvalid />
+          <Form.Control.Feedback type="invalid">
+            Please choose a username.
+          </Form.Control.Feedback > */}
+          <Form.Group>
+          <Form.Label>Operação</Form.Label><br></br>
+          <Form.Control.Feedback type="invalid">
+            Please provide a valid OP.
+          </Form.Control.Feedback >
+                  <Form.Check size="sm" name='op' required inline label="Emitir" type='radio' id={`inline-1`} onChange={handleChange} value="1" />
+                  <Form.Check size="sm" required inline name='op' label="Aposentar" type='radio' id={`inline-2`} onChange={handleChange} value="0" />
+          </Form.Group>
+          </Col>
+          <Form.Group> 
+          <Form.Label>Tipo</Form.Label><br></br>
+          <Form.Control.Feedback type="invalid" required isInvalid>
+            Please provide a valid id.
+          </Form.Control.Feedback>
+                  <Form.Check size="sm" name='id' required inline label="Carbono" type='radio' id={`inline-1`} onChange={handleChange} value="1" />
+                  <Form.Check size="sm" required inline name='id' label="Moeda" type='radio' id={`inline-2`} onChange={handleChange} value="0" />
+          </Form.Group>                
+          </Row>   
+          <Form.Label>Destino</Form.Label>
+          <Form.Control.Feedback type="invalid">
+            Insira uma chave pública
+          </Form.Control.Feedback>
+          <Form.Control
+             required
+             type="text"
+             name="destino" 
+             onChange={handleChange}
+             size="sm"
+          />
+          <div class="invalid-tooltip">
+            Please add a name.
+          </div>
+          <Form.Label>Valor</Form.Label>
+          <Form.Control.Feedback type="invalid">
+            Insira um valor válido
+          </Form.Control.Feedback>
+          <Form.Control
+             required
+             type="text" 
+             name="valor" 
+             onChange={handleChange}
+             size="sm"
+          />
+          
+        <br></br>
+                  <div className="text-right">
+                    <Button variant="danger" onClick={props.onClose}>
+                      Cancelar
+                    </Button>
+                    <Button variant="primary" type="submit">
+                      Executar
+                    </Button>
+                  </div> 
+        </form>
+        </div>
+        <div class="modal-footer">                
+        </div>
+        </div>
+
+      </div>
+    </CSSTransition>,
+    document.getElementById("root")
+  );
+};
+
+export default Modal;

@@ -57,7 +57,7 @@ export default function App() {
   const [timestamp, setTimestamp] = useState('');
   const [showModalTransf, setShow] = useState(false);
   // const [showModalMint, setShowMint] = useState(false);
-  const handleClose = () => setShow(false);
+  const handleClose = () => setShow(false); 
   // const handleShow = () => setShow(true);
   // const handleShowMint = () => setShowMint(true);
   // const handleCloseMint = () => setShowMint(false);
@@ -73,9 +73,8 @@ export default function App() {
  
   
   async function doOwner(){
-    const response = api.get('dono');
+    var response = api.get('dono');
     var dono = (await response).data
-    console.log((await response).data);
     MySwal.fire({
       title: <strong>Proprietário</strong>,
       html: <i>{dono}</i>,
@@ -315,13 +314,13 @@ export default function App() {
                       else if (key === "from") {
                         from = `${val[key]}`;
                         if (from === "0x0000000000000000000000000000000000000000" && obj.event === "TransferSingle") {
-                          transferencia = "Cunhagem"; 
+                          transferencia = "Cunhar"; 
                         }
                       }
                       else if (key === "to") {
                         to = `${val[key]}`;
                         if (to === "0x0000000000000000000000000000000000000000" && obj.event === "TransferSingle") {
-                          transferencia = "Queima"; 
+                          transferencia = "Aposentar"; 
                         }  
                       }
                       else if (key === "value") {
@@ -383,9 +382,9 @@ export default function App() {
           </Button>
         </Modal.Footer>
     </Modal> */}
-    <Modal1 title="Token" onClose={() => setShowModalToken(false)} show={showModalToken}>
+    <Modal1 title="Gerar Tokens" onClose={() => {setShowModalToken(false); refreshPage();}} show={showModalToken} >
     </Modal1>
-    <Modal2 title="Transferência" onClose={() => setShowModalTransfer(false)} show={showModalTransfer}>
+    <Modal2 title="Realizar transferências" onClose={() => {setShowModalTransfer(false); refreshPage();}} show={showModalTransfer} >
     </Modal2>                
 
   </div>

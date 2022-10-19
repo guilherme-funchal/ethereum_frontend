@@ -23,7 +23,7 @@
   }
   
   .modal-content {
-    width: 400px;
+    width: 500px;
     background-color: #fff;
     transition: all 0.3s ease-in-out;
     transform: translateY(-200px);
@@ -51,3 +51,23 @@
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
   }
+
+  .form-label {
+    display: inline-block;
+    font-size: 14px;
+    padding: 20px 0 0 0;
+    
+  }
+
+  .container {
+    padding: 3rem 0rem;
+  }
+  
+  h4 {
+    margin: 2rem 0rem 1rem;
+  }
+  .form-group {
+    position: relative;
+  }
+
+  
