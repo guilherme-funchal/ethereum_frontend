@@ -6,7 +6,7 @@ import withReactContent from 'sweetalert2-react-content';
 async function refreshPage() {
     await Toast.fire({
       icon: 'success',
-      title: 'Successo'
+      title: 'Página sendo atualizada'
     });
     window.location.reload(false);    
 }

@@ -1,5 +1,7 @@
 import './App.css';
 import Footer from './components/Footer';
+import Dashboard from './components/Dashboard';
+import Welcome from './components/Welcome';
 import Web3 from 'web3';
 import Menu from './components/Menu'
 import { ethers } from 'ethers';
@@ -10,7 +12,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Modal1 from "./components/modals/ModalToken";
 import Modal2 from "./components/modals/ModalTransfer";
-
+import data from './components/database/data.json';
 
 export default function App() {
 
@@ -71,8 +73,24 @@ export default function App() {
   const [showModalTransfer, setShowModalTransfer] = useState(false);
   const handleShowModalTransfer = () => setShowModalTransfer(true);
  
+  async function readUsers(){
+    console.log("Lendo os usuarios!!!")
+    const fs = require(data)
+    fs.readFile(data, 'utf8', (err, jsonString) => {
+        if (err) {
+            return;
+        }
+        try {
+            const users = JSON.parse(jsonString);
+            console.log('Usuarios :', users)
+    } catch(err) {
+            console.log('Error parsing JSON string:', err);
+        }
+    })
+  }
   
   async function doOwner(){
+    readUsers();
     var response = api.get('dono');
     var dono = (await response).data
     MySwal.fire({
@@ -84,22 +102,24 @@ export default function App() {
   
   async function doSaldoCarbono(){
     var conta = localStorage.getItem('wallet');
-    var response = api.get('saldo?conta=' + conta + '&wallet=1');
-    var carbono = (await response).data;
-    carbono = parseFloat(carbono);
-    carbono = carbono.toLocaleString('pt-br', {minimumFractionDigits: 2});
-    console.log('carbono:' + carbono);
-    return carbono;
+    if (conta){
+      var response = api.get('saldo?conta=' + conta + '&wallet=1');
+      var carbono = (await response).data;
+      carbono = parseFloat(carbono);
+      carbono = carbono.toLocaleString('pt-br', {minimumFractionDigits: 2});
+      return carbono;
+    }
   }
 
   async function doSaldoMoeda(){
     var conta = localStorage.getItem('wallet');
-    var response = api.get('saldo?conta=' + conta + '&wallet=0');
-    var moeda = (await response).data;
-    moeda = parseFloat(moeda);
-    moeda = moeda.toLocaleString('pt-br', {minimumFractionDigits: 2});
-    console.log('moeda:' + moeda)
-    return moeda;
+    if (conta){
+      var response = api.get('saldo?conta=' + conta + '&wallet=0');
+      var moeda = (await response).data;
+      moeda = parseFloat(moeda);
+      moeda = moeda.toLocaleString('pt-br', {minimumFractionDigits: 2});
+      return moeda;
+    }  
   }
 
   async function doTimestamp(param){
@@ -125,9 +145,14 @@ export default function App() {
   }
 
   async function doTransacoes(){
-    const response = api.get('transacoes');
-    var transactions_result = (await response).data;
-    return transactions_result;
+    var wallet = localStorage.getItem('wallet'); 
+    if (wallet){
+      const response = api.get('transacoes');
+      var transactions_result = (await response).data;
+      return transactions_result;
+    } else {
+      return transactions_result = "";
+    } 
   }
 
   async function doSignIn() {
@@ -166,6 +191,22 @@ export default function App() {
       setError(err.message);
     }
   }
+
+  async function doSignUpDirect(){
+    setError('');
+    const { value: wallet } = await Swal.fire({
+      title: 'Insira a sua chave',
+      icon: 'question',
+      input: 'text',
+      inputLabel: '',
+      inputPlaceholder: 'Entre sua chave privada'
+    })
+    
+    if (wallet) {
+      localStorage.setItem('wallet', wallet);
+      refreshPage();
+    }
+  }
   
   return (
     <div class="wrapper">
@@ -178,6 +219,11 @@ export default function App() {
           !wallet
             ? (
               <>
+              <div class="topnav-right">
+              <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUpDirect}> 
+                <i className="fa fa-paper-plane fa-1" />
+              </a>
+              </div>
               <div class="topnav-right">
               <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUp}> 
                 <i className="fa fa-lock" />
@@ -205,7 +251,7 @@ export default function App() {
       <div>
         <aside className="main-sidebar sidebar-dark-primary elevation-4">
           {/* Brand Logo */}
-          <a href="index3.html" className="brand-link">
+          <a href="http://localhost:3000" className="brand-link">
             <span className="brand-text font-weight-light">Dapp Carbono</span>
           </a>
           {/* Sidebar */}
@@ -222,173 +268,30 @@ export default function App() {
             <Menu handleShowModalToken={handleShowModalToken} handleShowModalTransfer={handleShowModalTransfer}/>
             
               </div>
-          </aside>     
-    <div className="content-wrapper">
-      <div className="content-header">
-        <div className="container-fluid">
-          <div className="row mb-2">
-            <div className="col-sm-6">
-              <h1 className="m-0 text-dark">Dashboard</h1>
-            </div>
-          </div>
-        </div>
-      </div>
-      <section className="content">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-lg-3 col-6">
-              <div className="small-box bg-danger">
-                <div className="inner">
-                  <h3>{carbono}</h3>
-                  <p>Saldo Carbono</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-bag" />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-6">
-              <div className="small-box bg-info">
-                <div className="inner">
-                  <h3>{moeda}</h3>
-                  <p>Saldo Moeda</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-bag" />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-6">
-              <div className="small-box bg-success">
-                <div className="inner">
-                  <h3>{transactions.length}</h3>
-                  <p>Transações</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-stats-bars" />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-6">
-              <div className="small-box bg-warning">
-                <div className="inner">
-                  <h3>10</h3>
-                  <p>Usuários registrados</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-person-add" />
-                </div>
-              </div>
-            </div>
-            
-          </div>
-          <div className="row">
-
-          </div>
-          
-          <p><h3>Transações</h3></p>
-          <table class="table w-auto" >
-                    <thead>
-                      <tr>
-                        <th><center>Evento</center></th>
-                        <th><center>Bloco</center></th>
-                        <th><center>Origem</center></th>
-                        <th><center>Destino</center></th>
-                        <th><center>Valor</center></th>
-                        <th><center>Timestamp</center></th>
-                      </tr>
-                    </thead>
-                    {transactions.map((obj) => {
-
-                    const val = obj.returnValues
-                    let from = ""
-                    let to = ""
-                    let operator = ""
-                    let value = ""
-                    let transferencia = "Transferencia"
-                    
-                    for (const key in val) {                    
-                      if (key === "operator") {
-                        operator = `${val[key]}`;  
-                      }
-                      else if (key === "from") {
-                        from = `${val[key]}`;
-                        if (from === "0x0000000000000000000000000000000000000000" && obj.event === "TransferSingle") {
-                          transferencia = "Cunhar"; 
-                        }
-                      }
-                      else if (key === "to") {
-                        to = `${val[key]}`;
-                        if (to === "0x0000000000000000000000000000000000000000" && obj.event === "TransferSingle") {
-                          transferencia = "Aposentar"; 
-                        }  
-                      }
-                      else if (key === "value") {
-                        value = `${val[key]}`;
-                        value = Web3.utils.fromWei(value, 'ether'); 
-                        value = parseFloat(value);
-                        value = value.toLocaleString('pt-br', {minimumFractionDigits: 2}); 
-                      }  
-                    } 
-
-                    return (
-
-                        <tr>
-                          <td>{transferencia}</td>
-                          <td><center>{obj.blockNumber}</center></td> 
-                          <td>{from}</td>   
-                          <td>{to}</td>
-                          <td><center>{value}</center></td>
-                          <td><center><button class="btn text-red" onClick={event => { doTimestamp(obj.blockNumber); handleTimestamp();}}
-><i class="fas fa fa-clock"></i></button></center></td>
-                        </tr>                         
-                    );
-                  })}
-                </table> 
-        </div>
-      </section>
-    </div>
-    <Modal show={showModalTransf} onHide={handleClose}>
-        <Modal.Header>
-          <Modal.Title>Transferência</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Enviar
-          </Button>
-        </Modal.Footer>
-    </Modal>
-    {/* <Modal show={showModalMint} onHide={handleCloseMint}>
-        <Modal.Header>
-          <Modal.Title>Emitir</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-        <form>
-          <label>Valor:
-            <input type="text" />
-          </label>
-        </form> 
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseMint}>
-            Cancelar
-          </Button>
-          <Button variant="primary" onClick={handleCloseMint}>
-            Enviar
-          </Button>
-        </Modal.Footer>
-    </Modal> */}
+          </aside>      
     <Modal1 title="Gerar Tokens" onClose={() => {setShowModalToken(false); refreshPage();}} show={showModalToken} >
     </Modal1>
     <Modal2 title="Realizar transferências" onClose={() => {setShowModalTransfer(false); refreshPage();}} show={showModalTransfer} >
     </Modal2>                
-
+  
+  
   </div>
-      <Footer wallet={wallet}/>
+      {
+      wallet
+            ? (
+            <>  
+              <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
+              <Footer wallet={wallet} moeda={moeda}/>
+            </>
+            )
+            : (
+            <>  
+              <Welcome />  
+              <Footer wallet={wallet} moeda={moeda}/>
+            </>
+            )
+      }
+      
   </div>
   );
 }

@@ -101,7 +101,7 @@ const ModalToken = props => {
             
           }
         
-          if (data.op === 'aposentar') {
+          if (data.op === 'queimar') {
             block = { 
               "account": data.destino,
               "id": data.tipo,
@@ -200,9 +200,9 @@ const ModalToken = props => {
                   <Form.Check
                     {...field}
                     type="radio"
-                    label="Aposentar"
+                    label="Queimar"
                     id={`inline-2`}
-                    value="aposentar"
+                    value="queimar"
                     placeholder="op"
                     isInvalid={errors.op}
                   />
