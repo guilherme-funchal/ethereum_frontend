@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Modal1 from "./components/modals/ModalToken";
 import Modal2 from "./components/modals/ModalTransfer";
-import data from './components/database/data.json';
+import Users from "./components/data/data.json"
 
 export default function App() {
 
@@ -53,6 +53,7 @@ export default function App() {
   
   const [error, setError] = useState('');
   const [wallet, setWallet] = useState('');
+  const [user, setUser] = useState('');
   const [transactions, setTransactions] = useState(['']);
   const [moeda, setBalanceMoeda] = useState('');
   const [carbono, setBalanceCarbono] = useState('');
@@ -73,24 +74,11 @@ export default function App() {
   const [showModalTransfer, setShowModalTransfer] = useState(false);
   const handleShowModalTransfer = () => setShowModalTransfer(true);
  
-  async function readUsers(){
-    console.log("Lendo os usuarios!!!")
-    const fs = require(data)
-    fs.readFile(data, 'utf8', (err, jsonString) => {
-        if (err) {
-            return;
-        }
-        try {
-            const users = JSON.parse(jsonString);
-            console.log('Usuarios :', users)
-    } catch(err) {
-            console.log('Error parsing JSON string:', err);
-        }
-    })
-  }
-  
+  //Show Users
+  //const [users, setUsers] = useState('');
+
+
   async function doOwner(){
-    readUsers();
     var response = api.get('dono');
     var dono = (await response).data
     MySwal.fire({
@@ -98,6 +86,19 @@ export default function App() {
       html: <i>{dono}</i>,
       icon: 'info'
     })
+  }
+
+  async function readUser(pk){
+    console.log('Wallet->', pk);
+    console.log('usuarios->', Users)
+    Users.map((data, key) => {
+      // console.log(typeof(data))
+    })
+    const found = Users.find(obj => {
+      return obj.user_id === pk;  
+    });
+    setUser(found);  
+    // console.log('---->', user.user_id)
   }
   
   async function doSaldoCarbono(){
@@ -136,10 +137,25 @@ export default function App() {
     });
   }
   
+
   async function WalletAtual(){
+    const found = readUser(wallet);
+
+    var html = 
+    '<p class="text-left small"><b>Wallet : </b><span>' + user.user_id + '</span></p>' + 
+    '<p class="text-left small"><b>Nome : </b><span>' + user.name + '</span></p>' + 
+    '<p class="text-left small"><b>Perfil : </b><span>' + user.profile + '</span></p>' + 
+    '<p class="text-left small"><b>Descrição : </b><span>' + user.desc + '</span></p>' + 
+    '<p class="text-left small"><b>Email: </b><span>' + user.email + '</span></p>'
+    
+    if (user.type === 'pj'){
+      html = html + '<p class="text-left small"><b>CNPJ: </b><span>' + user.doc + '</span></p>'
+    } else {
+      html = html + '<p class="text-left small"><b>CPF: </b><span>' + user.doc + '</span></p>'
+    }
+
     MySwal.fire({
-      title: <strong>Wallet</strong>,
-      html: <i>{wallet}</i>,
+      html: html,
       icon: 'info'
     });
   }
@@ -170,6 +186,7 @@ export default function App() {
     setWallet('');
     setError('');
     setTransactions('');
+    setUser('');
     setBalanceCarbono('');
     setBalanceMoeda('');
     setTimestamp('');
