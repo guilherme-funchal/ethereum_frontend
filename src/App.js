@@ -3,7 +3,9 @@ import Footer from './components/Footer';
 import Dashboard from './components/Dashboard';
 import Welcome from './components/Welcome';
 import Web3 from 'web3';
-import Menu from './components/Menu'
+import Menu from './components/Menu';
+import Projetos from './components/Projetos';
+import Usuarios from './components/Usuarios';
 import { ethers } from 'ethers';
 import { useState, useEffect } from 'react';
 import api from './api';
@@ -73,10 +75,12 @@ export default function App() {
   
   const [showModalTransfer, setShowModalTransfer] = useState(false);
   const handleShowModalTransfer = () => setShowModalTransfer(true);
- 
-  //Show Users
-  //const [users, setUsers] = useState('');
 
+  const [showProjects, setShowProjects] = useState(false);
+  const handleShowProjects = () => setShowProjects(true);
+ 
+  const [showUsuarios, setShowUsuarios] = useState(false);
+  const handleShowUsuarios = () => (setShowProjects(false), setShowUsuarios(true));
 
   async function doOwner(){
     var response = api.get('dono');
@@ -251,6 +255,7 @@ export default function App() {
             : (
               <>
               <div class="topnav-right">
+                
               <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doLogout}> 
                 <i className="fa fa-unlock-alt" />
               </a>
@@ -279,26 +284,57 @@ export default function App() {
                 <p class="text-white">Carteira Metamask <button id="btn1" class="btn text-light" onClick={WalletAtual}><i className="fas fa fa-info" />
               </button>
               <button id="btn2" class="btn text-light" onClick={doOwner}><i className="fas fa fa-university" /></button></p>
+              
               </div>
             </div>
             {/* <Menu handleShow={handleShow} handleShowMint={handleShowMint} handleShowModalToken={handleShowModalToken} handleShowModalTransfer={handleShowModalTransfer}/> */}
-            <Menu handleShowModalToken={handleShowModalToken} handleShowModalTransfer={handleShowModalTransfer}/>
+            <Menu handleShowModalToken={handleShowModalToken} handleShowModalTransfer={handleShowModalTransfer} handleShowProjects={handleShowProjects} handleShowUsuarios={handleShowUsuarios}/>
             
-              </div>
-          </aside>      
+            </div>
+          </aside> 
+      
     <Modal1 title="Gerar Tokens" onClose={() => {setShowModalToken(false); refreshPage();}} show={showModalToken} >
     </Modal1>
     <Modal2 title="Realizar transferências" onClose={() => {setShowModalTransfer(false); refreshPage();}} show={showModalTransfer} >
     </Modal2>                
   
-  
   </div>
       {
       wallet
             ? (
-            <>  
-              <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
-              <Footer wallet={wallet} moeda={moeda}/>
+            <> 
+            {console.log('showUsuarios->', showUsuarios)}
+            {console.log('showUProjects->', showProjects)}
+
+            {
+              showProjects
+              ? (
+              <>  
+                <Projetos/>
+                <Footer wallet={wallet} moeda={moeda}/>
+              </>  
+              ) : (
+                <>  
+                <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
+                <Footer wallet={wallet} moeda={moeda}/>
+                </>
+              )  
+            } 
+            
+            {
+              showUsuarios
+              ? (
+              <>  
+                <Usuarios/>
+                <Footer wallet={wallet} moeda={moeda}/>
+              </>  
+              ) : (
+                <>  
+                <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
+                <Footer wallet={wallet} moeda={moeda}/>
+                </>
+              )  
+            } 
             </>
             )
             : (
@@ -306,7 +342,7 @@ export default function App() {
               <Welcome />  
               <Footer wallet={wallet} moeda={moeda}/>
             </>
-            )
+            )     
       }
       
   </div>

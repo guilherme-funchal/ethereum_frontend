@@ -102,3 +102,17 @@ table.blueTable tfoot .links a{
   padding: 2px 8px;
   border-radius: 5px;
 }
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+.center-mini {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+}

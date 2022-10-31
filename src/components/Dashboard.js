@@ -20,7 +20,8 @@ async function doTimestamp(param){
   });
 }
 
-const MySwal = withReactContent(Swal)
+const MySwal = withReactContent(Swal);
+
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default function Dashboard( {wallet,moeda,carbono,transactions,setTimestamp} ){
@@ -35,6 +36,7 @@ export default function Dashboard( {wallet,moeda,carbono,transactions,setTimesta
             <div className="col-sm-6">
               <h1 className="m-0 text-dark">Dashboard</h1>
             </div>
+            
           </div>
         </div>
       </div>
@@ -90,7 +92,6 @@ export default function Dashboard( {wallet,moeda,carbono,transactions,setTimesta
           <div className="row">
 
           </div>
-          
           <p><h3>Transações</h3></p>
           {/* <table class="table w-auto" > */}
           <table class="blueTable">
@@ -155,7 +156,9 @@ export default function Dashboard( {wallet,moeda,carbono,transactions,setTimesta
                 </table> 
         </div>
       </section>
+      
     </div>
+    
   )}    
 
 
