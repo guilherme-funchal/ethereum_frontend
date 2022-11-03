@@ -27,13 +27,28 @@ const Toast = Swal.mixin({
 const MySwal = withReactContent(Swal);
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default function Child( {handleShow, handleShowMint, handleShowModalToken, handleShowModalTransfer, handleShowProjects, handleShowUsuarios} ){
+export default function Child( {
+  handleShow, 
+  handleShowMint, 
+  handleShowModalToken, 
+  handleShowModalTransfer, 
+  handleShowProjects, 
+  handleShowUsuarios, 
+  handleHideProjects, 
+  handleHideUsuarios, 
+  handleHideDashboard, 
+  handleShowDashboard
+} ){
   return (
     <div>  
         <nav className="mt-2">
                 <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                   <li className="nav-item has-treeview">
-                  <a href="index" className="nav-link active">
+                  <a href="" className="nav-link active"  onClick={() => { 
+                    handleShowDashboard(); 
+                    handleHideUsuarios(); 
+                    handleHideProjects();
+                  }}>
                     <i className="nav-icon fas fa-tachometer-alt" />
                     <p>
                       Dashboard
@@ -56,7 +71,11 @@ export default function Child( {handleShow, handleShowMint, handleShowModalToken
                   
                 </li>
                   <li className="nav-item has-treeview">
-                    <a href="#" className="nav-link active" onClick={handleShowProjects}>
+                    <a href="#" className="nav-link active" onClick={() => { 
+                      handleShowProjects(); 
+                      handleHideUsuarios(); 
+                      handleHideDashboard();
+                      }}>
                       <i className="nav-icon fas fa  fa-folder" />
                       <p>
                         Projetos
@@ -64,7 +83,11 @@ export default function Child( {handleShow, handleShowMint, handleShowModalToken
                     </a>
                   </li>
                   <li className="nav-item has-treeview">
-                    <a href="#" className="nav-link active" onClick={handleShowUsuarios}>
+                    <a href="#" className="nav-link active" onClick={() => { 
+                      handleShowUsuarios(); 
+                      handleHideProjects(); 
+                      handleHideDashboard();
+                      }}>
                       <i className="nav-icon fas fa  fa-user" />
                       <p>
                         Usuarios
@@ -84,8 +107,3 @@ export default function Child( {handleShow, handleShowMint, handleShowModalToken
     </div>
   )
 }
-
-    
-        
-
-   

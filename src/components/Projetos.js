@@ -91,5 +91,3 @@ export default function Dashboard( {wallet,moeda,carbono,transactions,setTimesta
       </section>
     </div>
   )}    
-
-

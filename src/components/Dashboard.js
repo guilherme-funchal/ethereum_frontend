@@ -3,8 +3,7 @@ import Web3 from 'web3';
 import api from './../api';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import Box from '@mui/material/Box';
-import { createSvgIcon } from '@mui/material/utils';
+
 
 
 async function doTimestamp(param){
@@ -93,7 +92,7 @@ export default function Dashboard( {wallet,moeda,carbono,transactions,setTimesta
 
           </div>
           <p><h3>Transações</h3></p>
-          {/* <table class="table w-auto" > */}
+
           <table class="blueTable">
                     <thead>
                       <tr>
@@ -147,7 +146,7 @@ export default function Dashboard( {wallet,moeda,carbono,transactions,setTimesta
                           <td>{from}</td>   
                           <td>{to}</td>
                           <td><center>{value}</center></td>
-                          <td><center><button class="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber);}}
+                          <td><center><button className="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber);}}
 ><i class="fa fa-clock fa-fw" style={{fontSize: "15px"}}></i></button></center></td>
                         </tr>                         
                     );

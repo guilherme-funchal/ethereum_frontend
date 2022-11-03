@@ -15,6 +15,7 @@ import withReactContent from 'sweetalert2-react-content';
 import Modal1 from "./components/modals/ModalToken";
 import Modal2 from "./components/modals/ModalTransfer";
 import Users from "./components/data/data.json"
+import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
 
 export default function App() {
 
@@ -61,11 +62,7 @@ export default function App() {
   const [carbono, setBalanceCarbono] = useState('');
   const [timestamp, setTimestamp] = useState('');
   const [showModalTransf, setShow] = useState(false);
-  // const [showModalMint, setShowMint] = useState(false);
   const handleClose = () => setShow(false); 
-  // const handleShow = () => setShow(true);
-  // const handleShowMint = () => setShowMint(true);
-  // const handleCloseMint = () => setShowMint(false);
   const handleTimestamp = () => setTimestamp(true); 
   const MySwal = withReactContent(Swal)
 
@@ -75,12 +72,20 @@ export default function App() {
   
   const [showModalTransfer, setShowModalTransfer] = useState(false);
   const handleShowModalTransfer = () => setShowModalTransfer(true);
+  
 
   const [showProjects, setShowProjects] = useState(false);
   const handleShowProjects = () => setShowProjects(true);
+  const handleHideProjects = () => setShowProjects(false);
  
   const [showUsuarios, setShowUsuarios] = useState(false);
-  const handleShowUsuarios = () => (setShowProjects(false), setShowUsuarios(true));
+  const handleShowUsuarios = () => setShowUsuarios(true);
+  const handleHideUsuarios = () => setShowUsuarios(false);
+
+  const [showDashboard, setShowDashboard] = useState(true);
+  const handleShowDashboard = () => setShowDashboard(true);
+  const handleHideDashboard = () => setShowDashboard(true);
+
 
   async function doOwner(){
     var response = api.get('dono');
@@ -93,16 +98,13 @@ export default function App() {
   }
 
   async function readUser(pk){
-    console.log('Wallet->', pk);
-    console.log('usuarios->', Users)
     Users.map((data, key) => {
-      // console.log(typeof(data))
     })
     const found = Users.find(obj => {
       return obj.user_id === pk;  
     });
     setUser(found);  
-    // console.log('---->', user.user_id)
+    return Users;
   }
   
   async function doSaldoCarbono(){
@@ -287,8 +289,15 @@ export default function App() {
               
               </div>
             </div>
-            {/* <Menu handleShow={handleShow} handleShowMint={handleShowMint} handleShowModalToken={handleShowModalToken} handleShowModalTransfer={handleShowModalTransfer}/> */}
-            <Menu handleShowModalToken={handleShowModalToken} handleShowModalTransfer={handleShowModalTransfer} handleShowProjects={handleShowProjects} handleShowUsuarios={handleShowUsuarios}/>
+
+            <Menu handleShowModalToken={handleShowModalToken} 
+            handleShowModalTransfer={handleShowModalTransfer} 
+            handleShowProjects={handleShowProjects} 
+            handleShowUsuarios={handleShowUsuarios} 
+            handleHideProjects={handleHideProjects}
+            handleHideUsuarios={handleHideUsuarios}
+            handleHideDashboard={handleHideDashboard}
+            />
             
             </div>
           </aside> 
@@ -300,41 +309,22 @@ export default function App() {
   
   </div>
       {
+       
       wallet
             ? (
-            <> 
-            {console.log('showUsuarios->', showUsuarios)}
-            {console.log('showUProjects->', showProjects)}
+            <>   
+            <If condition={showProjects == true}>
+            <Then>
+              <Projetos />
+            </Then>
+            <ElseIf condition={showUsuarios == true}>
+            <Usuarios />
 
-            {
-              showProjects
-              ? (
-              <>  
-                <Projetos/>
-                <Footer wallet={wallet} moeda={moeda}/>
-              </>  
-              ) : (
-                <>  
-                <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
-                <Footer wallet={wallet} moeda={moeda}/>
-                </>
-              )  
-            } 
-            
-            {
-              showUsuarios
-              ? (
-              <>  
-                <Usuarios/>
-                <Footer wallet={wallet} moeda={moeda}/>
-              </>  
-              ) : (
-                <>  
-                <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
-                <Footer wallet={wallet} moeda={moeda}/>
-                </>
-              )  
-            } 
+            </ElseIf>
+            <ElseIf condition={showDashboard == true}>
+              <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
+            </ElseIf>
+           </If>   
             </>
             )
             : (
@@ -348,6 +338,3 @@ export default function App() {
   </div>
   );
 }
-
-
-// export default App;
