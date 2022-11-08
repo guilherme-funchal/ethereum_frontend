@@ -1,93 +1,152 @@
-import './../App.css';
-import Web3 from 'web3';
+import React from 'react';
+import { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import ModalAddProjeto from "./modals/ModalAddProjeto";
+import ModalEditProject from "./modals/ModalEditProject";
 import api from '../api';
+import { useEffect, useCallback } from 'react';
+import moment from 'moment';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+
+export default function Projetos() {
+
+  useEffect(() => {
+    const resultado = doProjetos();
+  }, [])  
 
 
-const MySwal = withReactContent(Swal)
+  async function doProjetos() {
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default function Dashboard( {wallet,moeda,carbono,transactions,setTimestamp} ){
+    const response = await api.get('listarProjetos');
+    var projetos_result = (await response).data;
+    var promise = Promise.resolve(projetos_result);
+    promise.then(function (val) {
+      setProjetos(val);
+    });
+    await Toast.fire({
+      icon: 'success',
+      title: 'Lista de projetos atualizada'
+    });  
+    forceUpdate();
+    return projetos_result;
+  }
+
+  const [showModalAddProjeto, setShowModalAddProject] = useState(false);
+  const [showModalEditProject, setShowModalEditProject] = useState(false);
+  const [projetos, setProjetos] = useState(['']);
+  const IDprojeto = useState(['']);
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'bottom-right',
+    iconColor: 'green',
+    customClass: {
+      popup: 'colored-toast'
+    },
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true
+  });
+
+  
+  async function delProjeto(id){
+    Swal.fire({
+      title: 'Deseja excluir a conta?',
+      text: "",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var response = api.delete('projeto/' + id);
+
+        Toast.fire({
+            icon: 'success',
+            title: 'Usuário excluído'
+          });  
+        }
+        doProjetos();
+        forceUpdate();
+    })
+  }
+ 
   return (
 
-
-
-<div className="content-wrapper">
-      <div className="content-header">
-        <div className="container-fluid">
-          <div className="row mb-2">
-            <div className="col-sm-6">
-              <h1 className="m-0 text-dark">Projetos</h1>
-            </div>
+    <div>
+        <div className="content-wrapper">
+        <div className="content-header">
+          <div className="container-fluid">
+            <div className="row mb-2">
+              <div className="col-sm-6">
+                <h1 className="m-0">Projetos</h1>
+                </div>
           </div>
         </div>
       </div>
-      <section className="content">
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-lg-3 col-6">
-              <div className="small-box bg-danger">
-                <div className="inner">
-                  <h3></h3>
-                  <p>Cancelado</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-bag" />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-6">
-              <div className="small-box bg-info">
-                <div className="inner">
-                  <h3></h3>
-                  <p>Aguardando</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-bag" />
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-6">
-              <div className="small-box bg-success">
-                <div className="inner">
-                  <h3></h3>
-                  <p>Concluído</p>
-                </div>
-                <div className="icon">
-                  <i className="ion ion-stats-bars" />
-                </div>
-              </div>
-            </div>
-            
-            
-          </div>
-          <div className="row">
+                  <section className="content">
+                    <div className="container-fluid">
+                      <Button variant="primary" size="sm" onClick={() => setShowModalAddProject(true)}>
+                        Adiciona
+                      </Button>
+                      <table class="blueTable">
+                        <thead>
+                          <tr>
+                            <th><center>ID</center></th>
+                            <th><center>Nome</center></th>
+                            <th><center>Propositor</center></th>
+                            <th><center>Estado</center></th>
+                            <th><center>Area</center></th>
+                            <th><center>Documento</center></th>
+                            <th><center>Data criação</center></th>
+                            <th><center>Data atualização</center></th>
+                            <th><center>Operação</center></th>
+                          </tr>
+                        </thead>
+                        {projetos.map((data) => {
+                          if (data.projectIdCounter !== '0'){
+                          return (<tr>
+                            <td><center>{data.projectIdCounter}</center></td>
+                            <td><center>{data.name}</center></td>
+                            <td><center>{data.projectOwner}</center></td>
+                            <td><center>{data.state}</center></td>
+                            <td><center>{data.area}</center></td>
+                            <td><center>{data.documentation}</center></td>
+                            <td><center>{data.creationDate}</center></td>
+                            <td><center>{String(data.updateDate)}</center></td>
+                            <td><center> <div>
+                              <Button variant="primary" size="sm"  id={data.projectIdCounter} onClick={() => setShowModalEditProject(true)}>
+                                Editar
+                              </Button>
+                              <Button variant="danger" size="sm" onClick={() => delProjeto(data.projectIdCounter)}>
+                                Excluir
+                              </Button>
+                            </div>
+                            </center></td>  
+                          </tr>
+                          );
+                          }
+                        })}
 
-          </div>
-          
-          <p><h3>Transações</h3></p>
-          {/* <table class="table w-auto" > */}
-          <table class="blueTable">
-                    <thead>
-                      <tr>
-                        <th><center>ID</center></th>
-                        <th><center>Nome</center></th>
-                        <th><center>Propositor</center></th>
-                        <th><center>Estado</center></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    
-                        <tr>
-                          <td><center></center></td> 
-                          <td></td>   
-                          <td></td>
-                          <td></td>
-                        </tr>                         
-                  </tbody>
-                </table> 
+                        <tbody>
+                        </tbody>
+
+
+                      </table>
+                    </div>
+                  </section>
+
+                </div>{/* /.col */}
+              
+        <ModalAddProjeto title="Adicionar projeto" onClose={() => {setShowModalAddProject(false); forceUpdate()}} show={showModalAddProjeto}>
+        </ModalAddProjeto>
+                <ModalEditProject title="My ModalEditProject" onClose={() => {setShowModalEditProject(false);}} show={showModalEditProject}></ModalEditProject>
         </div>
-      </section>
-    </div>
-  )}    
+      )
+
+}

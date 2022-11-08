@@ -14,7 +14,6 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import Modal1 from "./components/modals/ModalToken";
 import Modal2 from "./components/modals/ModalTransfer";
-import Users from "./components/data/data.json"
 import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
 
 export default function App() {
@@ -98,13 +97,8 @@ export default function App() {
   }
 
   async function readUser(pk){
-    Users.map((data, key) => {
-    })
-    const found = Users.find(obj => {
-      return obj.user_id === pk;  
-    });
-    setUser(found);  
-    return Users;
+    var response = await api.get('account/find/' + pk);
+    setUser(response); 
   }
   
   async function doSaldoCarbono(){
@@ -148,16 +142,16 @@ export default function App() {
     const found = readUser(wallet);
 
     var html = 
-    '<p class="text-left small"><b>Wallet : </b><span>' + user.user_id + '</span></p>' + 
-    '<p class="text-left small"><b>Nome : </b><span>' + user.name + '</span></p>' + 
-    '<p class="text-left small"><b>Perfil : </b><span>' + user.profile + '</span></p>' + 
-    '<p class="text-left small"><b>Descrição : </b><span>' + user.desc + '</span></p>' + 
-    '<p class="text-left small"><b>Email: </b><span>' + user.email + '</span></p>'
+    '<p class="text-left small"><b>Wallet : </b><span>' + user.data[0].user_id + '</span></p>' + 
+    '<p class="text-left small"><b>Nome : </b><span>' + user.data[0].name + '</span></p>' + 
+    '<p class="text-left small"><b>Perfil : </b><span>' + user.data[0].profile + '</span></p>' + 
+    '<p class="text-left small"><b>Descrição : </b><span>' + user.data[0].desc + '</span></p>' + 
+    '<p class="text-left small"><b>Email: </b><span>' + user.data[0].email + '</span></p>'
     
     if (user.type === 'pj'){
-      html = html + '<p class="text-left small"><b>CNPJ: </b><span>' + user.doc + '</span></p>'
+      html = html + '<p class="text-left small"><b>CNPJ: </b><span>' + user.data[0].doc + '</span></p>'
     } else {
-      html = html + '<p class="text-left small"><b>CPF: </b><span>' + user.doc + '</span></p>'
+      html = html + '<p class="text-left small"><b>CPF: </b><span>' + user.data[0].doc + '</span></p>'
     }
 
     MySwal.fire({

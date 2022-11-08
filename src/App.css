@@ -116,3 +116,47 @@ table.blueTable tfoot .links a{
   margin-right: auto;
   width: 30%;
 }
+
+.swal2-popup {
+  font-size: 0.8rem !important;
+  font-family: Georgia, serif;
+}
+
+.swal2-input {
+  height: 4em;
+  padding: 1em;
+}
+
+.modal-open {
+  overflow: hidden;
+}
+
+.sw_active { overflow:hidden }
+
+.sweet-alert .swal-text {
+  max-height: 6em; /* To be adjusted as you like */
+  overflow-y: hidden;
+  width: 100%;
+}
+
+.swal2-in{
+  overflow-y: hidden
+}
+
+.swal2-shown{
+  overflow-y: hidden
+}
+
+body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) { overflow-y: visible !important; }
+
+.lb-sm {
+  font-size: 12px;
+}
+
+.lb-md {
+  font-size: 12px;
+}
+
+.lb-lg {
+  font-size: 14px;
+}
