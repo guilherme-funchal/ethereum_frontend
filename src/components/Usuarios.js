@@ -27,6 +27,7 @@ export default function Usuarios() {
   
   const [showModal1, setShowModal1] = useState(false);
   const MySwal = withReactContent(Swal);
+  
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
 
@@ -262,17 +263,10 @@ export default function Usuarios() {
     })
   }
   
- 
   const [usuarios, setUsuarios] = useState(['']);
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  
+  // const [show, setShow] = useState(false);
 
   return (
-
-
     <div className="content-wrapper">
       <div className="content-header">
         <div className="container-fluid">
@@ -318,15 +312,11 @@ export default function Usuarios() {
               </tr>
               );
             })}
-
             <tbody>
             </tbody>
-
-
           </table>
         </div>
       </section>
-      
     </div>
   )
 }    

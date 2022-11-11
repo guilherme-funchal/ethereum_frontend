@@ -7,42 +7,54 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { Controller, useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import moment from "moment";
 
-function ModalEditProjeto (props) {
-  
+const ModalEditProjeto = props => {
   const closeOnEscapeKeyDown = e => {
     if ((e.charCode || e.keyCode) === 27) {
       props.onClose();
     }
   };
-  
+
+  var promise = Promise.resolve(props.projeto);
+  promise.then(function (val) {
+    setOwner(val.data.projectOwner);
+    setApprover(val.data.projectApprover);
+    setName(val.data.name);
+    setDescription(val.data.description);
+    setDocumentation(val.data.documentation);
+    setHashDocumentation(val.data.hash_documentation);
+    setState(val.data.state);
+    setArea(val.data.area);
+    setCreationDate(val.data.creationDate);
+    setCreditAssigned(val.data.creditAssigned);
+    setprojectId(val.data.id);
+  });
+
+  const address = localStorage.getItem('wallet');
+  const MySwal = withReactContent(Swal)
+
   const [inputs, setInputs] = useState({});
   const [validated, setValidated] = useState(false);
-  const [selected, setSelected] = useState('yes');
-  
-  var state = props.items[0].state;
-  var area = props.items[0].area;
-  var creationdate = props.items[0].creationDate;
-  var area = props.items[0].area;
-  var id = props.items[0].id;
-  var name = props.items[0].name;
-  var approver = props.items[0].projectApprover;
-  var description = props.items[0].description;
-  var owner = props.items[0].projectOwner;
-  var documentation = props.items[0].documentation;
-  var hash_documentation = props.items[0].hash_documentation;
 
+  const [projectId, setprojectId] = useState(" ");
+  const [projectOwner, setOwner] = useState(" ");
+  const [projectApprover, setApprover] = useState(" ");
+  const [projectName, setName] = useState(" ");
+  const [projectDescription, setDescription] = useState(" ");
+  const [projectDocumentation, setDocumentation] = useState(" ");
+  const [projectprojectHashDocumentation, setHashDocumentation] = useState(" ");
+  const [projectState, setState] = useState(" ");
+  const [projectArea, setArea] = useState(" ");
+  const [projectCreationDate, setCreationDate] = useState(" ");
+  const [projectCreditAssignede, setCreditAssigned] = useState(" ");
+  const [selected, setSelected] = useState('yes');
+ 
   const handlesubmit = () => {
     form.current.reset(); //this will reset all the inputs in the form
   }
 
   function resetForm() {
     document.getElementById("form").reset();
-  }
-
-  function atribuirValor(){
-    console.log('atribuir valor...')
   }
 
   // const reload = () => window.location.reload();
@@ -53,39 +65,58 @@ function ModalEditProjeto (props) {
     handleSubmit,
     formState: { errors },
   } = useForm({
+    defaultValues: {
+      projectOwner: "",
+      projectApprover: "",
+      name: "",
+      description: "",
+      documentation: "",
+      hash_documentation: "",
+      state: "",
+      area: {projectArea},
+      creditAssigned: "",
+      creationDate: "",
+      updateDate: ""
+    },
   });
 
-
   const submitForm = (data) => {
-    const form = data.currentTarget;    
+    
+    const form = data.currentTarget;
+    console.log('--------->', projectArea)
+    
     var block = ""
     var response = '';
-    var current = moment()
-      .utcOffset('-03:00')
-      .format('DD/MM/YYYY hh:mm:ss a');
+    const current = Date.now();
     
-    if (state == "on"){
-      state = "enviado";
-    }
 
     block = {
-      "id": id,
-      "name": name,
-      "projectOwner": owner,
-      "projectApprover": approver,
-      "description": description,
-      "documentation": documentation,
-      "hash_documentation": hash_documentation,
-      "state": state,
-      "area": area,
+      "id": projectId,
+      "name": data.name,
+      "projectOwner": projectOwner,
+      "projectApprover": "0x0000000000000000000000000000000000000000",
+      "description": data.description,
+      "documentation": data.documentation,
+      "hash_documentation": projectprojectHashDocumentation,
+      "state": data.state,
+      "area": data.area,
       "creditAssigned": "0",
-      "creationDate": creationdate,
+      "creationDate": projectCreationDate,
       "updateDate": String(current)
     };
-
-    response = api.patch('/projeto', block);
+    console.log(block)
+    
+    // response = api.patch('/projeto', block);
     props.onClose();
   }
+
+  const submitFormEdit = (e) => {
+    console.log(form.data)
+  }
+
+useEffect(() => {
+}, []);
+
 
 return ReactDOM.createPortal(
   <CSSTransition
@@ -93,7 +124,7 @@ return ReactDOM.createPortal(
     unmountOnExit
     timeout={{ enter: 0, exit: 300 }}
   >
-    <div className="modal">
+    <div className="modal" onClick={props.onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h4 className="modal-title">{props.title}</h4>
@@ -102,17 +133,14 @@ return ReactDOM.createPortal(
         <form ref={form} noValidate onSubmit={handleSubmit(submitForm)}>
             <Row className="mb-3">
               <Form.Group as={Col}>
-                <Controller
+                <Form.Label for="state">Estado</Form.Label><br></br>
+                <input
+                  type="checkbox"
+                  id="state"
                   name="state"
-                  control={control}
-                  render={({ field }) => (
-                    <Form.Check 
-                      type="switch"
-                      id="state"
-                      label="Enviar"
-                      onChange={(e) => state=e.target.value}
-                    />
-                  )}
+                  placeholder="State"
+                  onChange={(e) => setState(e.target.value)}
+                  value="rascunho"
                 />
               </Form.Group>
             </Row>
@@ -122,32 +150,31 @@ return ReactDOM.createPortal(
                 type="text"
                 id="name"
                 name="name"
-                defaultValue={props.items[0].name}
+                value={projectName}
                 placeholder="Name"
-                onChange={(e) => name=e.target.value}
+                onChange={(e) => setName(e.target.value)}
               />  
             </Form.Group>
             <Form.Group as={Col} md="20">
               <Form.Label>Descrição</Form.Label>
               <Form.Control
-                as="textarea"
-                rows="3"
-                id="description"
-                name="description"
-                defaultValue={props.items[0].description}
+                type="text"
+                id="descricption"
+                name="descricption"
+                value={projectDescription}
                 placeholder="Description"
-                onChange={(e) => description=e.target.value}
+                onChange={(e) => setDescription(e.target.value)}
               />  
             </Form.Group>
             <Form.Group as={Col} md="20" >
               <Form.Label>Documentação</Form.Label>
               <Form.Control
-                type="textarea"
+                type="text"
                 id="documentacao"
                 name="documentation"
-                defaultValue={props.items[0].documentation}
+                defaultValue={projectDocumentation}
                 placeholder="Documentation"
-                onChange={(e) => documentation=e.target.value}
+                onChange={(e) => setDocumentation(e.target.value)}
                 />  
             </Form.Group>
             <Form.Group as={Col} md="20" >
@@ -156,9 +183,9 @@ return ReactDOM.createPortal(
                 type="text"
                 id="area"
                 name="area"
-                defaultValue={props.items[0].area}
+                defaultValue={projectArea}
                 placeholder="Area"
-                onChange={(e) => area=e.target.value}
+                onChange={(e) => setArea(e.target.value)}
                 />  
             </Form.Group>
             <div className="text-right">

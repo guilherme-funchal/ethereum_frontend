@@ -7,8 +7,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { Controller, useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ConstructionOutlined } from "@mui/icons-material";
-
+import moment from "moment";
 
 const ModalAddProjeto = props => {
   const closeOnEscapeKeyDown = e => {
@@ -16,6 +15,11 @@ const ModalAddProjeto = props => {
       props.onClose();
     }
   };
+
+  const [, setValues] = useState({
+    id: 0,
+    state: ""
+  });
   
   const address = localStorage.getItem('wallet');
   const MySwal = withReactContent(Swal)
@@ -44,6 +48,13 @@ const ModalAddProjeto = props => {
   const reload = () => window.location.reload();
   const form = useRef(null);
 
+  const onChange = (e) => {
+    setValues({
+      ...form,
+      [e.target.name]: e.target.value
+    });
+  };
+
   const {
     control,
     handleSubmit,
@@ -68,8 +79,10 @@ const ModalAddProjeto = props => {
     const form = data.currentTarget;
     var block = ""
     var response = '';
-    const current = Date.now();
-
+    var current = moment()
+      .utcOffset('-03:00')
+      .format('DD/MM/YYYY hh:mm:ss a');
+       
     block = {
       "projectOwner": address,
       "projectApprover": "0x0000000000000000000000000000000000000000",
@@ -77,18 +90,17 @@ const ModalAddProjeto = props => {
       "description": data.description,
       "documentation": data.documentation,
       "hash_documentation": data.hash_documentation,
-      "state": data.state,
+      "state": "rascunho",
       "area": data.area,
       "creditAssigned": "0",
       "creationDate": String(current),
       "updateDate": String(current)
     };
+
     response = api.post('/projeto', block);
     props.onClose();
   }
 
-useEffect(() => {
-}, []);
 
 return ReactDOM.createPortal(
   <CSSTransition
@@ -96,59 +108,13 @@ return ReactDOM.createPortal(
     unmountOnExit
     timeout={{ enter: 0, exit: 300 }}
   >
-    <div className="modal" onClick={props.onClose}>
+    <div className="modal">
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h4 className="modal-title">{props.title}</h4>
         </div>
         <div className="modal-body">
           <form ref={form} noValidate onSubmit={handleSubmit(submitForm)}>
-            <Row className="mb-3">
-              <Form.Group as={Col} controlId="validationCustom01">
-                <Form.Label>Estado</Form.Label>
-                <Controller
-                  name="state"
-                  control={control}
-                  onChange={(e) => setState(e.target.value)}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <Form.Check
-                      {...field}
-                      type="radio"
-                      label="Rascunho"
-                      id={`inline-1`}
-                      value="rascunho"
-                      placeholder="op"
-                      isInvalid={errors.tipo}
-                    />
-                  )}
-                />
-                <Controller
-                  name="state"
-                  control={control}
-                  onChange={(e) => setState(e.target.value)}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <Form.Check
-                      {...field}
-                      type="radio"
-                      label="Enviar"
-                      id={`inline-2`}
-                      value="enviar"
-                      placeholder="op"
-                      isInvalid={errors.op}
-                    />
-                  )}
-                />
-                {errors.op && (
-                  <div class="invalid-feedback">
-                    <Form.Control.Feedback type="invalid">
-                      O campo Operação é requerido
-                    </Form.Control.Feedback>
-                  </div>
-                )}
-              </Form.Group>
-            </Row>
             <Form.Group as={Col} md="20" controlId="validationCustom01">
               <Form.Label>Nome</Form.Label>
               <Controller
@@ -183,7 +149,8 @@ return ReactDOM.createPortal(
                 render={({ field }) => (
                   <Form.Control
                     {...field}
-                    type="text"
+                    as="textarea"
+                    rows="3"
                     placeholder="Descrição do projeto"
                     isInvalid={errors.description}
                   />
