@@ -82,10 +82,12 @@ export default function Projetos() {
   };
   
   async function EditItemsProject(id) {
-    fetch("http://localhost:3001/projeto?id=" + id)
-      .then((response) => response.json())
-      .then((items) => setItems(items))
-      .catch((err) => console.log(err));
+    // fetch("http://localhost:3001/projeto?id=" + id)
+    //   .then((response) => response.json())
+    //   .then((items) => setItems(items))
+    //   .catch((err) => console.log(err));
+    var response = await api.get('projeto?id=' + id);
+    setItems(response.data);
   }
 
   async function DataItemsProject(id) {
@@ -94,6 +96,7 @@ export default function Projetos() {
   }
 
   async function viewProjeto(id) {
+    EditItemsProject(id);
     setShowModalViewProject(true);  
   }
 
@@ -208,9 +211,9 @@ export default function Projetos() {
               
         <ModalAddProject toggle={toggle} keyboard={false} backdrop={"static"}  title="Adicionar projeto" onClose={() => {setShowModalAddProject(false); forceUpdate()}} show={showModalAddProjeto}>
         </ModalAddProject>
-        {/* <ModalViewProject title="Dados do Projeto" dataItems={dataItems} onClose={() => {setShowModalViewProject(false); forceUpdate()}} show={showModalViewProject}>
-        </ModalViewProject> */}
-        <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => {doProjetos(); forceUpdate(); setShowModalEditProject(false);}} show={showModalEditProject}>
+        <ModalViewProject title="Dados do Projeto" items={items} onClose={() => {setShowModalViewProject(false); forceUpdate()}} show={showModalViewProject}>
+        </ModalViewProject>
+        <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => {setShowModalEditProject(false); doProjetos(); forceUpdate();}} show={showModalEditProject}>
         </ModalEditProject>
         </div>
       )

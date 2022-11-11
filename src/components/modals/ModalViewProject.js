@@ -16,7 +16,7 @@ function ModalViewProjeto (props) {
       props.onClose();
     }
   };
-  
+ 
 return ReactDOM.createPortal(
   <CSSTransition
     in={props.show}
@@ -37,43 +37,43 @@ return ReactDOM.createPortal(
         </thead>
         <tr>
         <td><b>Nome do projeto</b></td>
-        <td>{props.dataItems.data[0].name}</td>   
+        <td>{props.items[0].name}</td>   
         </tr> 
         <tr>
         <td><b>Descrição</b></td>
-        <td>{props.dataItems.data[0].description}</td>   
+        <td>{props.items[0].description}</td>   
         </tr> 
         <tr>
         <td><b>Documentação</b></td>
-        <td>{props.dataItems.data[0].documentation}</td>   
+        <td>{props.items[0].documentation}</td>   
         </tr> 
         <tr>
         <td><b>Hash doc</b></td>
-        <td>{props.dataItems.data[0].hash_documentation}</td>   
+        <td>{props.items[0].hash_documentation}</td>   
         </tr> 
         <tr>
         <td><b>Propositor</b></td>
-        <td>{props.dataItems.data[0].projectOwner}</td>   
+        <td>{props.items[0].projectOwner}</td>   
         </tr> 
         <tr>
         <td><b>Aprovador</b></td>
-        <td>{props.dataItems.data[0].projectApprover}</td>   
+        <td>{props.items[0].projectApprover}</td>   
         </tr>
         <tr>
         <td><b>Estado</b></td>
-        <td>{props.dataItems.data[0].state}</td>   
+        <td>{props.items[0].state}</td>   
         </tr>
         <tr>
         <td><b>Crédito</b></td>
-        <td>{props.dataItems.data[0].creditAssigned}</td>   
+        <td>{props.items[0].creditAssigned}</td>   
         </tr> 
         <tr>
         <td><b>Data de criação</b></td>
-        <td>{props.dataItems.data[0].creationDate}</td>   
+        <td>{props.items[0].creationDate}</td>   
         </tr> 
         <tr>
         <td><b>Data de atualização</b></td>
-        <td>{props.dataItems.data[0].updateDate}</td>   
+        <td>{props.items[0].updateDate}</td>   
         </tr> 
         </table> 
         <div><br></br></div>                   
