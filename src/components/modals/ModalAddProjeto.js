@@ -9,7 +9,8 @@ import { Controller, useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
 
-const ModalAddProjeto = props => {
+function ModalAddProjeto (props) {
+
   const closeOnEscapeKeyDown = e => {
     if ((e.charCode || e.keyCode) === 27) {
       props.onClose();
@@ -21,21 +22,29 @@ const ModalAddProjeto = props => {
     state: ""
   });
   
+  const inputRef = useRef()
+  
   const address = localStorage.getItem('wallet');
-  const MySwal = withReactContent(Swal)
+  // const MySwal = withReactContent(Swal)
 
-  const [inputs, setInputs] = useState({});
-  const [validated, setValidated] = useState(false);
+  // const [inputs, setInputs] = useState({});
+  // const [validated, setValidated] = useState(false);
 
-  const [projectOwner, setOwner] = useState(" ");
-  const [projectApprove, setApprove] = useState(" ");
-  const [projectName, setName] = useState(" ");
-  const [projectDescription, setDescription] = useState(" ");
-  const [projectDocumentation, setDocumentation] = useState(" ");
-  const [projectprojectHashDocumentation, setHashDocumentation] = useState(" ");
-  const [projectState, setState] = useState(" ");
-  const [projectArea, setArea] = useState(" ");
-  const [projectCreditAssignede, setCreditAssigned] = useState(" ");
+  // const [projectOwner, setOwner] = useState("");
+  // const [projectApprove, setApprove] = useState("");
+  const [projectName, setName] = useState("");
+  const [projectDescription, setDescription] = useState("");
+  // const [projectDocumentation, setDocumentation] = useState("");
+  // const [projectHashDocumentation, setHashDocumentation] = useState("");
+  // const [projectState, setState] = useState("");
+  const [projectArea, setArea] = useState("");
+  // const [projectCreditAssignede, setCreditAssigned] = useState("");
+
+  const [file, setFile] = useState('');
+  const [status, setStatus] = useState({
+    type: '',
+    mensagem: ''
+  });
 
   const handlesubmit = () => {
     form.current.reset(); //this will reset all the inputs in the form
@@ -75,7 +84,7 @@ const ModalAddProjeto = props => {
     },
   });
 
-  const submitForm = (data) => {
+  async function submitForm(data){  
     const form = data.currentTarget;
     var block = ""
     var response = '';
@@ -83,13 +92,27 @@ const ModalAddProjeto = props => {
       .utcOffset('-03:00')
       .format('DD/MM/YYYY hh:mm:ss a');
        
+    
+    let formdata = new FormData(); 
+    formdata.append('file', file);
+
+    const headers = {
+      'headers': {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+   
+    console.log('formdata->', formdata);
+
+    var transactions_result = await api.post("/upload", formdata, headers);
+
     block = {
       "projectOwner": address,
       "projectApprover": "0x0000000000000000000000000000000000000000",
       "name": data.name,
       "description": data.description,
-      "documentation": data.documentation,
-      "hash_documentation": data.hash_documentation,
+      "documentation": transactions_result.data.file,
+      "hash_documentation": transactions_result.data.hash_file,
       "state": "rascunho",
       "area": data.area,
       "creditAssigned": "0",
@@ -97,7 +120,7 @@ const ModalAddProjeto = props => {
       "updateDate": String(current)
     };
 
-    response = api.post('/projeto', block);
+    response = await api.post('/projeto', block);
     props.onClose();
   }
 
@@ -166,27 +189,7 @@ return ReactDOM.createPortal(
             </Form.Group>
             <Form.Group as={Col} md="20" controlId="validationCustom01">
               <Form.Label>Documentação</Form.Label>
-              <Controller
-                name="documentation"
-                control={control}
-                onChange={(e) => setDocumentation(e.target.value)}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Form.Control
-                    {...field}
-                    type="text"
-                    placeholder="Documentação do projeto"
-                    isInvalid={errors.documentation}
-                  />
-                )}
-              />
-              {errors.documentation && (
-                <div class="invalid-feedback">
-                  <Form.Control.Feedback type="invalid">
-                    O campo name é requerido
-                  </Form.Control.Feedback>
-                </div>
-              )}
+              <input type="file" name="documentation" onChange={e => setFile(e.target.files[0])} />
             </Form.Group>
             <Form.Group as={Col} md="20" controlId="validationCustom01">
               <Form.Label>Area</Form.Label>

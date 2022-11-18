@@ -6,6 +6,7 @@ import Web3 from 'web3';
 import Menu from './components/Menu';
 import Projetos from './components/Projetos';
 import Usuarios from './components/Usuarios';
+import Webcommerce from './components/Webcommerce';
 import { ethers } from 'ethers';
 import { useState, useEffect } from 'react';
 import api from './api';
@@ -20,9 +21,11 @@ export default function App() {
 
   useEffect(() => {
     const address = localStorage.getItem('wallet');
+
     setWallet(address);  
     const moeda = doSaldoMoeda();
     const carbono = doSaldoCarbono();
+    const taxas = doTaxas();
 
     moeda
     .then((value) => {
@@ -31,6 +34,14 @@ export default function App() {
     .catch((err) => {
       console.log(err); 
     });
+    
+    // taxas
+    // .then((value) => {
+    //   setTaxas(value);
+    // })
+    // .catch((err) => {
+    //   console.log(err); 
+    // });
 
     carbono
     .then((value) => {
@@ -52,6 +63,8 @@ export default function App() {
 
 
   }, [])
+
+
   
   const [error, setError] = useState('');
   const [wallet, setWallet] = useState('');
@@ -83,8 +96,18 @@ export default function App() {
 
   const [showDashboard, setShowDashboard] = useState(true);
   const handleShowDashboard = () => setShowDashboard(true);
-  const handleHideDashboard = () => setShowDashboard(true);
+  const handleHideDashboard = () => setShowDashboard(false);
 
+  const [showWebcommerce, setShowWebcommerce] = useState(false);
+  const handleShowWebcommerce = () => setShowWebcommerce(true);
+  const handleHideWebcommerce = () => setShowWebcommerce(false);
+
+  const [taxas, setTaxas] = useState('');
+    
+  async function doTaxas() {
+    var response = await api.get('tax/list');
+    await setTaxas(response);
+  }
 
   async function doOwner(){
     var response = api.get('dono');
@@ -284,13 +307,17 @@ export default function App() {
               </div>
             </div>
 
-            <Menu handleShowModalToken={handleShowModalToken} 
+            <Menu 
+            handleShowModalToken={handleShowModalToken} 
             handleShowModalTransfer={handleShowModalTransfer} 
             handleShowProjects={handleShowProjects} 
             handleShowUsuarios={handleShowUsuarios} 
             handleHideProjects={handleHideProjects}
             handleHideUsuarios={handleHideUsuarios}
             handleHideDashboard={handleHideDashboard}
+            handleShowDashboard={handleShowDashboard}
+            handleShowWebcommerce={handleShowWebcommerce}
+            handleHideWebcommerce={handleHideWebcommerce}
             />
             
             </div>
@@ -303,20 +330,22 @@ export default function App() {
   
   </div>
       {
-       
+    
       wallet
             ? (
             <>   
             <If condition={showProjects == true}>
             <Then>
-              <Projetos />
+              <Projetos taxas={taxas} />
             </Then>
             <ElseIf condition={showUsuarios == true}>
-            <Usuarios />
-
-            </ElseIf>
+            <Usuarios taxas={taxas} />              
+            </ElseIf>   
             <ElseIf condition={showDashboard == true}>
               <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
+            </ElseIf>
+            <ElseIf condition={showWebcommerce == true}>
+            <Webcommerce taxas={taxas} />              
             </ElseIf>
            </If>   
             </>

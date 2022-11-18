@@ -9,13 +9,18 @@ import { Controller, useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
 
+
+
 function ModalViewProjeto (props) {
-  
+
+  const link = "http://localhost:3001/upload/" + props.items[0].documentation;
+
   const closeOnEscapeKeyDown = e => {
     if ((e.charCode || e.keyCode) === 27) {
       props.onClose();
     }
   };
+
  
 return ReactDOM.createPortal(
   <CSSTransition
@@ -45,7 +50,8 @@ return ReactDOM.createPortal(
         </tr> 
         <tr>
         <td><b>Documentação</b></td>
-        <td>{props.items[0].documentation}</td>   
+        <td><a href={link} target="_blank">{props.items[0].documentation}</a></td>
+
         </tr> 
         <tr>
         <td><b>Hash doc</b></td>

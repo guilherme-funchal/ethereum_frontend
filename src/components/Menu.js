@@ -37,7 +37,9 @@ export default function Child( {
   handleHideProjects, 
   handleHideUsuarios, 
   handleHideDashboard, 
-  handleShowDashboard
+  handleShowDashboard,
+  handleHideWebcommerce,
+  handleShowWebcommerce
 } ){
   return (
     <div>  
@@ -48,6 +50,7 @@ export default function Child( {
                     handleShowDashboard(); 
                     handleHideUsuarios(); 
                     handleHideProjects();
+                    handleHideWebcommerce();
                   }}>
                     <i className="nav-icon fas fa-tachometer-alt" />
                     <p>
@@ -75,6 +78,7 @@ export default function Child( {
                       handleShowProjects(); 
                       handleHideUsuarios(); 
                       handleHideDashboard();
+                      handleHideWebcommerce();
                       }}>
                       <i className="nav-icon fas fa  fa-folder" />
                       <p>
@@ -87,10 +91,24 @@ export default function Child( {
                       handleShowUsuarios(); 
                       handleHideProjects(); 
                       handleHideDashboard();
+                      handleHideWebcommerce();
                       }}>
                       <i className="nav-icon fas fa  fa-user" />
                       <p>
-                        Usuarios
+                        Administração
+                      </p>
+                    </a>
+                  </li>
+                  <li className="nav-item has-treeview">
+                    <a href="#" className="nav-link active" onClick={() => { 
+                      handleHideUsuarios(); 
+                      handleHideProjects(); 
+                      handleHideDashboard();
+                      handleShowWebcommerce();
+                      }}>
+                      <i className="nav-icon fas fa  fa-user" />
+                      <p>
+                        Webcommerce
                       </p>
                     </a>
                   </li>

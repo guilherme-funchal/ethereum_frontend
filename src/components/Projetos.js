@@ -11,7 +11,7 @@ import { useEffect, useCallback } from 'react';
 import moment from 'moment';
 import Swal from 'sweetalert2';
 
-export default function Projetos() {
+export default function Projetos(props) {
 
   useEffect(() => {
     const resultado = doProjetos();
@@ -19,16 +19,14 @@ export default function Projetos() {
 
   async function doProjetos() {
 
-    const response = await api.get('listarProjetos');
-    var projetos_result = (await response).data;
-    var promise = Promise.resolve(projetos_result);
-    promise.then(function (val) {
-      setProjetos(val);
+    var projetos_result = await api.get('listarProjetos');
+
+    await setProjetos(projetos_result.data);
+    
+    await Toast.fire({
+      icon: 'success',
+      title: 'Lista de projetos atualizada'
     });
-    // await Toast.fire({
-    //   icon: 'success',
-    //   title: 'Lista de projetos atualizada'
-    // });  
     forceUpdate();
     return projetos_result;
   }
@@ -56,25 +54,10 @@ export default function Projetos() {
   });
   
   const [items, setItems] = useState([' ']);
+  const [AprovItems, setAprovItems] = useState([' ']);
 
   // const [dataItems, setDataItems] = useState({});
-
-  // async function setProjeto(id){
-  //   // var response = api.get('projeto?id=' + id);
-  //   // .them(response => response.json())
-  //   // var promise = Promise.resolve(response);
-  //   // promise.then(function (val) {
-  //   //   setItems(val)
-  //   // });
-  //   console.log("---->", id)
-  //   fetch("http://localhost:3001/projeto?id=" + id)
-  //     .then((response) => response.json())
-  //     .then((items) => setItems(items))
-  //     .catch((err) => console.log(err));
-    
-  //   setShowModalEditProject(true);  
-  // }  
-   
+  
   const [modal, setModal] = useState(false);
   
   const toggle = () => {
@@ -82,10 +65,6 @@ export default function Projetos() {
   };
   
   async function EditItemsProject(id) {
-    // fetch("http://localhost:3001/projeto?id=" + id)
-    //   .then((response) => response.json())
-    //   .then((items) => setItems(items))
-    //   .catch((err) => console.log(err));
     var response = await api.get('projeto?id=' + id);
     setItems(response.data);
   }
@@ -97,7 +76,8 @@ export default function Projetos() {
 
   async function viewProjeto(id) {
     EditItemsProject(id);
-    setShowModalViewProject(true);  
+    setShowModalViewProject(true); 
+    forceUpdate(); 
   }
 
   async function editProjeto(id) {
@@ -105,11 +85,59 @@ export default function Projetos() {
     setShowModalEditProject(true);  
   }
   
-  async function aprovarProjeto(id){
-    console.log('Aprovar!!!')
+  async function transferCredit(account,creditAssigned) {
+    
+    var block_money = {
+      "account": AprovItems[0].projectOwner,
+      "id": "1",
+      "amount": creditAssigned,
+      "data": "0x"
+    };
+    await api.post('emitir', block_money);
+  }
+
+  async function aprovarProjeto(id) {
+
     var response = await api.get('projeto?id=' + id);
-    console.log(response);
-    // setItens(response);
+    setAprovItems(response.data);
+
+    var current = moment()
+    .utcOffset('-03:00')
+    .format('DD/MM/YYYY hh:mm:ss a');
+
+    let creditAssigned = 0;
+    creditAssigned = response.data[0].area * props.taxas.data.carbono;
+
+    const block = {
+      "id": response.data[0].id,
+      "name": response.data[0].name,
+      "projectOwner": response.data[0].projectOwner,
+      "projectApprover": response.data[0].projectApprover,
+      "description": response.data[0].description,
+      "documentation": response.data[0].documentation,
+      "hash_documentation": response.data[0].creationDate,
+      "state": "concluido",
+      "area": response.data[0].area,
+      "creditAssigned": String(creditAssigned),
+      "creationDate": response.data[0].creationDate,
+      "updateDate": String(current)};
+    
+    var response_patch = await api.patch('/projeto', block);
+
+    if (response_patch.status == 200){
+      var block_money = {
+        "account": response.data[0].projectOwner,
+        "id": "1",
+        "amount": String(creditAssigned),
+        "data": "0x"
+      };
+      await api.post('emitir', block_money);
+    }
+
+    await doProjetos();
+    await forceUpdate();
+
+    Swal.fire('Projeto aprovado, crédito carbono gerado!', '', 'success');
   }
 
   async function delProjeto(id){
@@ -135,7 +163,8 @@ export default function Projetos() {
         forceUpdate();
     })
   }
- 
+  
+
   return (
 
     <div>
@@ -162,12 +191,15 @@ export default function Projetos() {
                             <th><center>Valor</center></th>
                             <th><center>Data criação</center></th>
                             <th><center>Data atualização</center></th>
-                            <th><center>Operação</center></th>
+                            <th><center>Operações disponíveis</center></th>
                           </tr>
                         </thead>
                         {projetos.map((data) => {
-                          
-
+                          var test = true
+                          if (data.state === 'concluido'){
+                            test = false; 
+                          }
+                          const style = { width: '70px' }
                           if (data.id !== '0'){
                           return (<tr>
                             <td onClick={() => viewProjeto(data.id)}><center>{data.id}</center></td>
@@ -178,18 +210,18 @@ export default function Projetos() {
                             <td onClick={() => viewProjeto(data.id)}><center>{data.creditAssigned}</center></td>
                             <td onClick={() => viewProjeto(data.id)}><center>{data.creationDate}</center></td>
                             <td onClick={() => viewProjeto(data.id)}><center>{data.updateDate}</center></td>
-                            <td><center> <div>
-                              <Button variant="primary" size="sm"  name="teste" onClick={() => editProjeto(data.id)}>
-                                Editar
-                              </Button>
-                              <Button variant="danger" size="sm" onClick={() => delProjeto(data.id)}>
-                                Excluir
-                              </Button>
-                              <Button variant="success" size="sm" onClick={() => aprovarProjeto(data.id)}>
-                                Aprovar
-                              </Button>
-                            </div>
-                            </center></td>  
+                            
+                            {test === true ? 
+                            (
+                                <td><center><div>
+                                <Button style={style} class="btn btn-default" rounded variant="primary" size="sm"  name="teste" onClick={() => editProjeto(data.id)}>Editar</Button>
+                                <Button style={style} class="btn btn-default" rounded variant="danger" size="sm" onClick={() => delProjeto(data.id)}>Excluir</Button>
+                                <Button style={style} class="btn btn-default" rounded variant="success" size="sm" onClick={() => aprovarProjeto(data.id)}>Aprovar</Button>
+                                </div></center></td>
+                            ) : (
+                              <td><center><div>
+                              </div></center></td>
+                            )}
                           </tr>
                           );
                           }
@@ -209,11 +241,11 @@ export default function Projetos() {
 
                 </div>{/* /.col */}
               
-        <ModalAddProject toggle={toggle} keyboard={false} backdrop={"static"}  title="Adicionar projeto" onClose={() => {setShowModalAddProject(false); forceUpdate()}} show={showModalAddProjeto}>
+        <ModalAddProject toggle={toggle} keyboard={false} backdrop={"static"}  title="Adicionar projeto" onClose={() => {doProjetos();forceUpdate();setItems(' ');setShowModalAddProject(false);}} show={showModalAddProjeto}>
         </ModalAddProject>
-        <ModalViewProject title="Dados do Projeto" items={items} onClose={() => {setShowModalViewProject(false); forceUpdate()}} show={showModalViewProject}>
+        <ModalViewProject title="Dados do Projeto" items={items} onClose={() => {setShowModalViewProject(false); }} show={showModalViewProject}>
         </ModalViewProject>
-        <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => {setShowModalEditProject(false); doProjetos(); forceUpdate();}} show={showModalEditProject}>
+        <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => {doProjetos();forceUpdate();setShowModalEditProject(false);setItems(' ');}} show={showModalEditProject}>
         </ModalEditProject>
         </div>
       )

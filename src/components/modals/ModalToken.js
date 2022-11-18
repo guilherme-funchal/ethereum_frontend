@@ -74,12 +74,15 @@ const ModalToken = props => {
         console.log(data.op)
         if (data.op === 'emitir') {
           block = {
-            "account": data.destino,
+            "account": data.destino.trim(),
             "id": data.tipo,
-            "amount": data.valor,
+            "amount": data.valor.trim(),
             "data": "0x"
           };
-          response = api.post('emitir', block);
+        
+        console.log('Block->', block)  
+
+        response = api.post('emitir', block);
 
           Swal.fire({
             title: 'Transação realizada',

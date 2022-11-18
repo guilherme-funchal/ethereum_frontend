@@ -56,7 +56,7 @@ function ModalEditProjeto (props) {
   });
 
 
-  const submitForm = (data) => {
+  async function submitForm(data){
     const form = data.currentTarget;    
     var block = ""
     var response = '';
@@ -83,7 +83,7 @@ function ModalEditProjeto (props) {
       "updateDate": String(current)
     };
 
-    response = api.patch('/projeto', block);
+    response = await api.patch('/projeto', block);
     props.onClose();
   }
 

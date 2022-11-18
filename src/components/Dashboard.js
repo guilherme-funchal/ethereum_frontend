@@ -137,14 +137,18 @@ export default function Dashboard( {wallet,moeda,carbono,transactions,setTimesta
                         value = value.toLocaleString('pt-br', {minimumFractionDigits: 2}); 
                       }  
                     } 
-
+                    if (from === "0x0000000000000000000000000000000000000000") {
+                      from = "Smart contract"
+                    }
+                    
                     return (
 
                         <tr>
-                          <td>{transferencia}</td>
+                          <td><center>{transferencia}</center></td>
                           <td><center>{obj.blockNumber}</center></td> 
-                          <td>{from}</td>   
-                          <td>{to}</td>
+                          <td><center>{from}</center></td>   
+
+                          <td><center>{to}</center></td>
                           <td><center>{value}</center></td>
                           <td><center><button className="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber);}}
 ><i class="fa fa-clock fa-fw" style={{fontSize: "15px"}}></i></button></center></td>

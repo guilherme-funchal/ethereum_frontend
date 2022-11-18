@@ -7,11 +7,19 @@ import { Button } from 'react-bootstrap/';
 import { useState, useEffect, useCallback } from 'react';
 
 
-export default function Usuarios() {  
+export default function Usuarios(props) {
+
+  const [showModal1, setShowModal1] = useState(false);
+  const MySwal = withReactContent(Swal);
+
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+
+  const [taxas, setTaxas] = useState('');
 
   useEffect(() => {
     const resultado = doUsuarios();
-  }, [])  
+  }, [])
 
   const Toast = Swal.mixin({
     toast: true,
@@ -24,80 +32,120 @@ export default function Usuarios() {
     timer: 2500,
     timerProgressBar: true
   });
-  
-  const [showModal1, setShowModal1] = useState(false);
-  const MySwal = withReactContent(Swal);
-  
-  const [, updateState] = useState();
-  const forceUpdate = useCallback(() => updateState({}), []);
 
-  async function doUsuarios(){
+
+  async function doUsuarios() {
     const response = api.get('account/list');
-      var transactions_result = (await response).data;
+    var transactions_result = (await response).data;
 
-      var promise = Promise.resolve(transactions_result);
-      promise.then(function(val) {
-       setUsuarios(val);
-      });
-      return transactions_result;
+    var promise = Promise.resolve(transactions_result);
+    promise.then(function (val) {
+      setUsuarios(val);
+    });
+    return transactions_result;
   }
 
   async function refreshPage() {
     window.location.reload(false);
   }
+  
+  async function editCarbono(){
+    var block = ''
+    const { value: carbono } = await Swal.fire({
+      title: 'Cotação para o carbono',
+      input: 'text',
+      inputLabel: '',
+      inputPlaceholder: 'Valor do carbono'
+    })
+    var moeda = props.taxas.data.moeda;
+    if (carbono) {
+      block = {
+        "id": 1,
+        "carbono": carbono,
+        "moeda": moeda 
+      };
 
-  async function editUsuario(user_id){
+      var response = await api.patch('tax/' + 1, block);
+      Swal.fire(`Valor do carbono : ${carbono}`);
+      props.taxas.data.carbono = carbono;
+      forceUpdate();
+    }
+  }
+  async function editMoeda(){
+    var block = ''
+    const { value: moeda } = await Swal.fire({
+      title: 'Cotação para a moeda',
+      input: 'text',
+      inputLabel: '',
+      inputPlaceholder: 'Valor da Moeda'
+    })
+    var carbono = props.taxas.data.carbono;
+
+    if (moeda) {
+      block = {
+        "id": 1,
+        "carbono": carbono,
+        "moeda": moeda 
+      };
+      var response = await api.patch('tax/' + 1, block);
+      Swal.fire(`Valor da moeda : ${moeda}`);
+      props.taxas.data.moeda = moeda;
+      forceUpdate();
+    }
+  }
+
+  async function editUsuario(user_id) {
     var response = await api.get('account/find/' + user_id);
     var user = response.data[0].user_id;
 
     const { value: formValues } = await Swal.fire({
       title: 'Editar dados do usuário?',
       html:
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">User Id</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="user_id" name="user_id" value=' + String(response.data[0].user_id) + '>' +
-      '</div></div>' +
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Perfil</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="profile" name="profile" value=' + String(response.data[0].profile) + '>' +
-      '</div></div>' +
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Desc</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="desc" name="desc" value=' + String(response.data[0].desc) + '>' +
-      '</div></div>' +
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Nome</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="name" name="name" value=' + String(response.data[0].name) + '>' +
-      '</div></div>' +
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Email</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="email" name="email" value=' + String(response.data[0].email) + '>' +
-      '</div></div>' +
-      
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Doc</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="doc" name="doc" value=' + String(response.data[0].doc) + '>' +
-      '</div></div>' + 
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">User Id</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="user_id" name="user_id" value=' + String(response.data[0].user_id) + '>' +
+        '</div></div>' +
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Perfil</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="profile" name="profile" value=' + String(response.data[0].profile) + '>' +
+        '</div></div>' +
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Desc</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="desc" name="desc" value=' + String(response.data[0].desc) + '>' +
+        '</div></div>' +
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Nome</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="name" name="name" value=' + String(response.data[0].name) + '>' +
+        '</div></div>' +
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Email</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="email" name="email" value=' + String(response.data[0].email) + '>' +
+        '</div></div>' +
 
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Tipo</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="type" name="type" value=' + String(response.data[0].type) + '>' +
-      '</div></div>' ,
-      
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Doc</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="doc" name="doc" value=' + String(response.data[0].doc) + '>' +
+        '</div></div>' +
+
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Tipo</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="type" name="type" value=' + String(response.data[0].type) + '>' +
+        '</div></div>',
+
 
       focusConfirm: true,
       confirmButtonText: 'Sim',
@@ -118,7 +166,7 @@ export default function Usuarios() {
         ]
       }
     })
-    
+
     if (formValues) {
       const timestamp = Date.now();
       var block = {
@@ -126,11 +174,11 @@ export default function Usuarios() {
         "profile": document.getElementById('profile').value,
         "desc": document.getElementById('desc').value,
         "name": document.getElementById('name').value,
-        "email" : document.getElementById('email').value,
+        "email": document.getElementById('email').value,
         "type": document.getElementById('type').value,
         "doc": document.getElementById('doc').value,
         "created_at": String(response.data[0].created_at),
-        "updated_at" : timestamp,
+        "updated_at": timestamp,
         "last_login": String(response.data[0].last_login)
       };
       response = api.patch('account/' + user_id, block);
@@ -140,59 +188,59 @@ export default function Usuarios() {
       await Toast.fire({
         icon: 'success',
         title: 'Usuário atualizado'
-      });  
+      });
     }
   }
 
-  async function novoUsuario(){
+  async function novoUsuario() {
 
     const { value: formValues } = await Swal.fire({
       title: 'Criar usuário',
       html:
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">User Id</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="user_id" name="user_id" placeholder="Insira o ID da carteira">' +
-      '</div></div>' +
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Perfil</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="profile" name="profile" value="" placeholder="propositor-comprador-monitor-comprador">' +      '</div></div>' +
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Desc</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="desc" name="desc" value="" placeholder="Descrição">' +
-      '</div></div>' +
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Nome</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="name" name="name" value="" placeholder="Nome">' +
-      '</div></div>' +
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Email</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="email" name="email" value="" placeholder="Email">' +
-      '</div></div>' +
-      
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Doc</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="doc" name="doc" value="" placeholder="Documento">' +
-      '</div></div>' + 
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">User Id</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="user_id" name="user_id" placeholder="Insira o ID da carteira">' +
+        '</div></div>' +
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Perfil</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="profile" name="profile" value="" placeholder="propositor-comprador-monitor-comprador">' + '</div></div>' +
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Desc</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="desc" name="desc" value="" placeholder="Descrição">' +
+        '</div></div>' +
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Nome</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="name" name="name" value="" placeholder="Nome">' +
+        '</div></div>' +
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Email</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="email" name="email" value="" placeholder="Email">' +
+        '</div></div>' +
 
-      '<form class="form-inline">' +
-      '<div class="form-group row">' + 
-      '<label for="inp_descricao" class="col-sm-2 col-form-label">Tipo</label>' +
-      '<div class="col-sm-1">' +
-      '<input type="text" size="36" class="form-control form-control-sm" id="type" name="type" value="" placeholder="pj ou pf">' +
-      '</div></div>' ,
-      
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Doc</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="doc" name="doc" value="" placeholder="Documento">' +
+        '</div></div>' +
+
+        '<form class="form-inline">' +
+        '<div class="form-group row">' +
+        '<label for="inp_descricao" class="col-sm-2 col-form-label">Tipo</label>' +
+        '<div class="col-sm-1">' +
+        '<input type="text" size="36" class="form-control form-control-sm" id="type" name="type" value="" placeholder="pj ou pf">' +
+        '</div></div>',
+
 
       focusConfirm: true,
       confirmButtonText: 'Sim',
@@ -213,7 +261,7 @@ export default function Usuarios() {
         ]
       }
     })
-    
+
     if (formValues) {
       const timestamp = Date.now();
       var block = {
@@ -221,26 +269,26 @@ export default function Usuarios() {
         "profile": document.getElementById('profile').value,
         "desc": document.getElementById('desc').value,
         "name": document.getElementById('name').value,
-        "email" : document.getElementById('email').value,
+        "email": document.getElementById('email').value,
         "type": document.getElementById('type').value,
         "doc": document.getElementById('doc').value,
         "created_at": timestamp,
-        "updated_at" : timestamp,
+        "updated_at": timestamp,
         "last_login": timestamp
       };
-      
+
       var response = api.post('account/add/', block);
 
       await Toast.fire({
         icon: 'success',
         title: 'Usuário incluído'
-      });  
+      });
       doUsuarios();
       forceUpdate();
     }
   }
 
-  async function delUsuario(user_id){
+  async function delUsuario(user_id) {
     Swal.fire({
       title: 'Deseja excluir a conta?',
       text: "",
@@ -254,16 +302,17 @@ export default function Usuarios() {
       if (result.isConfirmed) {
         var response = api.delete('account/' + user_id);
         Toast.fire({
-            icon: 'success',
-            title: 'Usuário excluído'
-          });  
-        }
-        doUsuarios();
-        forceUpdate();
+          icon: 'success',
+          title: 'Usuário excluído'
+        });
+      }
+      doUsuarios();
+      forceUpdate();
     })
   }
-  
+
   const [usuarios, setUsuarios] = useState(['']);
+
   // const [show, setShow] = useState(false);
 
   return (
@@ -280,7 +329,7 @@ export default function Usuarios() {
       <section className="content">
         <div className="container-fluid">
           <Button variant="primary" size="sm" onClick={novoUsuario}>
-          Adicionar usuário
+            Adicionar usuário
           </Button>
           <table class="blueTable">
             <thead>
@@ -293,7 +342,9 @@ export default function Usuarios() {
                 <th><center>Operação</center></th>
               </tr>
             </thead>
+
             {usuarios.map((data) => {
+              const style = { width: '60px' }
               return (<tr>
                 <td><center>{data.user_id}</center></td>
                 <td><center>{data.name}</center></td>
@@ -301,13 +352,13 @@ export default function Usuarios() {
                 <td><center>{data.profile}</center></td>
                 <td><center>{data.type}</center></td>
                 <td><center> <div>
-                  <Button variant="primary" size="sm" onClick={() => editUsuario(data.user_id)}>
+                  <Button style={style} variant="primary" size="sm" onClick={() => editUsuario(data.user_id)}>
                     Editar
                   </Button>
-                  <Button variant="danger" size="sm" onClick={() => delUsuario(data.user_id)}>
+                  <Button style={style} variant="danger" size="sm" onClick={() => delUsuario(data.user_id)}>
                     Excluir
                   </Button>
-                  </div>
+                </div>
                 </center></td>
               </tr>
               );
@@ -317,6 +368,35 @@ export default function Usuarios() {
           </table>
         </div>
       </section>
-    </div>
+      <div><br></br></div>
+      <section className="content">
+      <div class="row">  
+        <div class="col-lg-5 col-8">
+          <div class="small-box bg-success">
+            <div class="inner">
+            <h3>{props.taxas.data.carbono}</h3>
+            <p>Taxa de conversão de Carbono</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-bag"></i>
+            </div>
+            <a href="#" class="small-box-footer" onClick={() => editCarbono()}>Alterar <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div> 
+        <div class="col-lg-5 col-8"> 
+          <div class="small-box bg-warning">  
+            <div class="inner">
+              <h3>{props.taxas.data.moeda}</h3>
+              <p>Taxa de conversão de Moeda</p>
+            </div>
+            <div class="icon">
+              <i class="ion ion-bag"></i>
+            </div>
+            <a href="#" class="small-box-footer" onClick={() => editMoeda()}>Alterar <i class="fas fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        </div>
+        </section>      
+      </div>
   )
 }    
