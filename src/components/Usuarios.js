@@ -328,6 +328,7 @@ export default function Usuarios(props) {
       </div>
       <section className="content">
         <div className="container-fluid">
+          
           <Button variant="primary" size="sm" onClick={novoUsuario}>
             Adicionar usuário
           </Button>
@@ -369,7 +370,14 @@ export default function Usuarios(props) {
         </div>
       </section>
       <div><br></br></div>
+      <div className="container-fluid"> 
+      <div className="row mb-2">
+            <div className="col-sm-6">
+              <h2 className="m-0 text-dark">Cotações</h2>
+            </div>
+          </div>
       <section className="content">
+      
       <div class="row">  
         <div class="col-lg-5 col-8">
           <div class="small-box bg-success">
@@ -396,7 +404,8 @@ export default function Usuarios(props) {
           </div>
         </div>
         </div>
-        </section>      
+        </section>  
+      </div>       
       </div>
   )
 }    

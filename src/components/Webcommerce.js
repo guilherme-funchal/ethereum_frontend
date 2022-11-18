@@ -6,7 +6,7 @@ import withReactContent from 'sweetalert2-react-content';
 import { Button } from 'react-bootstrap/';
 import { useState, useEffect, useCallback } from 'react';
 import { DomainDisabledOutlined } from '@mui/icons-material';
-
+import { Confirm } from 'react-st-modal';
 
 export default function Webcommerce(props) {
 
@@ -35,7 +35,7 @@ export default function Webcommerce(props) {
     timer: 2500,
     timerProgressBar: true
   });
-
+  
   async function doUsuarios() {
     var response = await api.get('saldo-contas?wallet=1');
     var transactions_result = response.data;
@@ -47,37 +47,55 @@ export default function Webcommerce(props) {
 
     var block = ""
     block = { 
-         "from": origem,
-         "to": destino,
-         "id": id,
+         "from": String(origem),
+         "to": String(destino),
+         "id": String(id),
          "amount": String(valor),
          "data": "0x"
     };
     console.log("bloco->", block);
-    const response = api.post('transferir', block);
+    const response = await api.post('transferir', block);
+    
   }
 
   async function comprarCredito(vendedor, credito) {
     
     var moeda = credito * props.taxas.data.moeda;
-    moeda = parseFloat(moeda);
+    // moeda = parseFloat(moeda);
     var block = "";
     var conta = localStorage.getItem('wallet');
     var response = await api.get('account/find/' + conta);
     var profile = response.data[0].profile;
     var comprador = response.data[0].user_id;
-    if (profile === "comprador")
+    var saldo = await api.get('saldo?conta=' + conta + "&wallet=0");
+
+    Swal.fire({
+      title: 'Você deseja realizar a compra?',
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: 'Sim',
+      denyButtonText: `Não`,
+      icon: 'question',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (profile === "comprador")
     {
-      var saldo = await api.get('saldo?conta=' + conta + "&wallet=0");
       if (saldo.data > moeda){
-          await doTransfer(vendedor, comprador, 1, credito);
-          await doTransfer(comprador, vendedor, 0, moeda);
+          doTransfer(vendedor, comprador, 1, credito);
+          doTransfer(comprador, vendedor, 0, moeda);
       } else {
         Swal.fire('Sem saldo para adquirir o crédito!', '', 'fail');
       }
     } else {
        Swal.fire('Somente usuários com perfil de "Comprador" pode adquirir crédito!', '', 'fail');
-    }
+    }  
+      
+      } else if (result.isDenied) {
+        Swal.fire('Compra cancelada!!!', '', 'info')
+      }
+    })
+    
+    
     
   }
 

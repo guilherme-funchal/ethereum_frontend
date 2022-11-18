@@ -186,7 +186,7 @@ export default function App() {
   async function doTransacoes(){
     var wallet = localStorage.getItem('wallet'); 
     if (wallet){
-      const response = api.get('transacoes');
+      const response = await api.get('transacoes');
       var transactions_result = (await response).data;
       return transactions_result;
     } else {
@@ -306,6 +306,7 @@ export default function App() {
               
               </div>
             </div>
+            
 
             <Menu 
             handleShowModalToken={handleShowModalToken} 
@@ -342,7 +343,7 @@ export default function App() {
             <Usuarios taxas={taxas} />              
             </ElseIf>   
             <ElseIf condition={showDashboard == true}>
-              <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} setTimestamp={setTimestamp}/>
+              <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} taxas={taxas} user={user} setTimestamp={setTimestamp}/>
             </ElseIf>
             <ElseIf condition={showWebcommerce == true}>
             <Webcommerce taxas={taxas} />              

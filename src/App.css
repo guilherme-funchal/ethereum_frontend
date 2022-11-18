@@ -75,17 +75,20 @@ table.blueTable thead th:first-child {
 }
 
 table.blueTable tfoot {
-  font-size: 12px;
+  /* font-size: 16px;
   font-weight: bold;
-  color: #FFFFFF;
-  background: #D0E4F5;
+  color: #0000; */
+  /* background: #D0E4F5;
   background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
   background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
   background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-  border-top: 2px solid #444444;
+  border-top: 2px solid #444444; */
+  padding: 3px 2px;
+  font-size: 14px;
+  height: 80%;
 }
 table.blueTable tfoot td {
-  font-size: 10px;
+  font-size: 14px;
 }
 table.blueTable td {
   font-size: 14px;
