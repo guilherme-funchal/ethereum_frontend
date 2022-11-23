@@ -43,7 +43,7 @@ export default function Usuarios(props) {
     toast: true,
     position: 'bottom-right',
     iconColor: 'green',
-    customClass: {
+    customclassName: {
       popup: 'colored-toast'
     },
     showConfirmButton: false,
@@ -160,7 +160,7 @@ export default function Usuarios(props) {
           <Button variant="primary" size="sm" onClick={() => setShowModalAddUser(true)}>
                         Adicionar usuário
           </Button>
-          <table class="blueTable">
+          <table className="blueTable">
             <thead>
               <tr>
                 <th><center>User ID</center></th>
@@ -202,43 +202,43 @@ export default function Usuarios(props) {
       </section>
       <div><br></br></div>
       <div className="container-fluid"> 
-      <div className="row mb-2">
+      <div c="row mb-2">
             <div className="col-sm-6">
               <h2 className="m-0 text-dark">Cotações</h2>
             </div>
           </div>
       <section className="content">
       
-      <div class="row">  
-        <div class="col-lg-5 col-8">
-          <div class="small-box bg-success">
-            <div class="inner">
+      <div className="row">  
+        <div className="col-lg-5 col-8">
+          <div className="small-box bg-success">
+            <div className="inner">
             <h3>{props.taxas.data.carbono}</h3>
             <p>Taxa de conversão de Carbono</p>
             </div>
-            <div class="icon">
-              <i class="ion ion-bag"></i>
+            <div className="icon">
+              <i className="ion ion-bag"></i>
             </div>
-            <a href="#" class="small-box-footer" onClick={() => editCarbono()}>Alterar <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="#" className="small-box-footer" onClick={() => editCarbono()}>Alterar <i className="fas fa-arrow-circle-right"></i></a>
           </div>
         </div> 
-        <div class="col-lg-5 col-8"> 
-          <div class="small-box bg-warning">  
-            <div class="inner">
+        <div className="col-lg-5 col-8"> 
+          <div className="small-box bg-warning">  
+            <div className="inner">
               <h3>{props.taxas.data.moeda}</h3>
               <p>Taxa de conversão de Moeda</p>
             </div>
-            <div class="icon">
-              <i class="ion ion-bag"></i>
+            <div className="icon">
+              <i className="ion ion-bag"></i>
             </div>
-            <a href="#" class="small-box-footer" onClick={() => editMoeda()}>Alterar <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="#" className="small-box-footer" onClick={() => editMoeda()}>Alterar <i className="fas fa-arrow-circle-right"></i></a>
           </div>
         </div>
         </div>
         </section>  
       </div>  
       
-      <ModalAddUser  onClose={() => {doUsuarios();forceUpdate();setShowModalAddUser(false);}} show={showModalAddUser}></ModalAddUser>
+      <ModalAddUser  onClose={() => {doUsuarios();forceUpdate();setShowModalAddUser(false);setItems(' ');}} show={showModalAddUser}></ModalAddUser>
       <ModalEditUser items={items} onClose={() => {doUsuarios();forceUpdate();setShowModalEditUser(false);setItems(' ');}} show={showModalEditUser}></ModalEditUser>     
       </div>
       

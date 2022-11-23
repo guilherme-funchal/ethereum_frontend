@@ -74,21 +74,21 @@ export default function Child( {
   let token = false;
   let transf = false;
 
-  if (user?.profile === 'registro' || user?.profile === 'comprador') {
+  if (user?.profile === 'registrador' || user?.profile === 'comprador') {
     webcommerce = true;
   } 
 
-  if (user?.profile === 'registro' || user?.profile === 'certificadora' || user?.profile === 'propositor')
+  if (user?.profile === 'registrador' || user?.profile === 'certificador' || user?.profile === 'propositor')
   {
     projetos = true;
   } 
  
-  if (user?.profile === 'registro')
+  if (user?.profile === 'registrador')
   {
     administracao = true;
   } 
    
-  if (user?.profile === 'registro' || user?.profile === 'certificadora')
+  if (user?.profile === 'registrador' || user?.profile === 'certificador')
   {
     token = true;
     transf = true;
@@ -123,7 +123,7 @@ export default function Child( {
                   <Then>
                   <li className="nav-item">
                     <a href="#" className="nav-link" onClick={handleShowModalToken}>
-                      <i className="nav-icon fas fa  fa-arrows-alt" />
+                      <i className="nav-icon ion ion-cash" />
                       <p>
                       Tokens
                       </p>

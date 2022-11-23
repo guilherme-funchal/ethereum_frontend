@@ -21,6 +21,7 @@ export default function App() {
 
   useEffect(() => {
     const address = localStorage.getItem('wallet');
+    readUser(address);
 
     setWallet(address);  
     const moeda = doSaldoMoeda();
@@ -110,8 +111,8 @@ export default function App() {
   }
 
   async function doOwner(){
-    var response = api.get('dono');
-    var dono = (await response).data
+    var response = await api.get('dono');
+    var dono = response.data
     MySwal.fire({
       title: <strong>Proprietário</strong>,
       html: <i>{dono}</i>,
@@ -127,8 +128,8 @@ export default function App() {
   async function doSaldoCarbono(){
     var conta = localStorage.getItem('wallet');
     if (conta){
-      var response = api.get('saldo?conta=' + conta + '&wallet=1');
-      var carbono = (await response).data;
+      var response = await api.get('saldo?conta=' + conta + '&wallet=1');
+      var carbono = response.data;
       carbono = parseFloat(carbono);
       carbono = carbono.toLocaleString('pt-br', {minimumFractionDigits: 2});
       return carbono;
@@ -138,8 +139,8 @@ export default function App() {
   async function doSaldoMoeda(){
     var conta = localStorage.getItem('wallet');
     if (conta){
-      var response = api.get('saldo?conta=' + conta + '&wallet=0');
-      var moeda = (await response).data;
+      var response = await api.get('saldo?conta=' + conta + '&wallet=0');
+      var moeda = response.data;
       moeda = parseFloat(moeda);
       moeda = moeda.toLocaleString('pt-br', {minimumFractionDigits: 2});
       return moeda;
@@ -148,8 +149,8 @@ export default function App() {
 
   async function doTimestamp(param){
     const block = { block: param };
-    const response = api.post('carimbo', block);
-    var timestamp_result = (await response).data;
+    const response = await api.post('carimbo', block);
+    var timestamp_result = response.data;
     var date = new Date(timestamp_result * 1000);
     var resultado = date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
     setTimestamp(resultado);
@@ -165,16 +166,16 @@ export default function App() {
     const found = readUser(wallet);
 
     var html = 
-    '<p class="text-left small"><b>Wallet : </b><span>' + user.data[0].user_id + '</span></p>' + 
-    '<p class="text-left small"><b>Nome : </b><span>' + user.data[0].name + '</span></p>' + 
-    '<p class="text-left small"><b>Perfil : </b><span>' + user.data[0].profile + '</span></p>' + 
-    '<p class="text-left small"><b>Descrição : </b><span>' + user.data[0].desc + '</span></p>' + 
-    '<p class="text-left small"><b>Email: </b><span>' + user.data[0].email + '</span></p>'
+    '<p className="text-left small"><b>Wallet : </b><span>' + user.data[0].user_id + '</span></p>' + 
+    '<p className="text-left small"><b>Nome : </b><span>' + user.data[0].name + '</span></p>' + 
+    '<p className="text-left small"><b>Perfil : </b><span>' + user.data[0].profile + '</span></p>' + 
+    '<p className="text-left small"><b>Descrição : </b><span>' + user.data[0].desc + '</span></p>' + 
+    '<p className="text-left small"><b>Email: </b><span>' + user.data[0].email + '</span></p>'
     
     if (user.type === 'pj'){
-      html = html + '<p class="text-left small"><b>CNPJ: </b><span>' + user.data[0].doc + '</span></p>'
+      html = html + '<p className="text-left small"><b>CNPJ: </b><span>' + user.data[0].doc + '</span></p>'
     } else {
-      html = html + '<p class="text-left small"><b>CPF: </b><span>' + user.data[0].doc + '</span></p>'
+      html = html + '<p className="text-left small"><b>CPF: </b><span>' + user.data[0].doc + '</span></p>'
     }
 
     MySwal.fire({
@@ -249,7 +250,7 @@ export default function App() {
   }
   
   return (
-    <div class="wrapper">
+    <div className="wrapper">
       <header>
       <div>
         <nav className="main-header navbar navbar-expand navbar-white navbar-light navbar-right">
@@ -259,12 +260,12 @@ export default function App() {
           !wallet
             ? (
               <>
-              <div class="topnav-right">
+              <div className="topnav-right">
               <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUpDirect}> 
                 <i className="fa fa-paper-plane fa-1" />
               </a>
               </div>
-              <div class="topnav-right">
+              <div className="topnav-right">
               <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUp}> 
                 <i className="fa fa-lock" />
               </a>
@@ -273,7 +274,7 @@ export default function App() {
             )
             : (
               <>
-              <div class="topnav-right">
+              <div className="topnav-right">
                 
               <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doLogout}> 
                 <i className="fa fa-unlock-alt" />
@@ -300,9 +301,9 @@ export default function App() {
             {/* Sidebar user panel (optional) */}
             <div className="user-panel mt-3 pb-3 mb-3 d-flex">
               <div className="info">
-                <p class="text-white">Carteira Metamask <button id="btn1" class="btn text-light" onClick={WalletAtual}><i className="fas fa fa-info" />
+                <p className="text-white">Carteira Metamask <button id="btn1" className="btn text-light" onClick={WalletAtual}><i className="fas fa fa-info" />
               </button>
-              <button id="btn2" class="btn text-light" onClick={doOwner}><i className="fas fa fa-university" /></button></p>
+              <button id="btn2" className="btn text-light" onClick={doOwner}><i className="fas fa fa-university" /></button></p>
               
               </div>
             </div>
@@ -337,13 +338,13 @@ export default function App() {
             <>   
             <If condition={showProjects == true}>
             <Then>
-              <Projetos taxas={taxas} />
+              <Projetos taxas={taxas} user={user}/>
             </Then>
             <ElseIf condition={showUsuarios == true}>
             <Usuarios taxas={taxas} />              
             </ElseIf>   
             <ElseIf condition={showDashboard == true}>
-              <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} taxas={taxas} user={user} setTimestamp={setTimestamp}/>
+              <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} taxas={taxas} setTimestamp={setTimestamp}/>
             </ElseIf>
             <ElseIf condition={showWebcommerce == true}>
             <Webcommerce taxas={taxas} />              
