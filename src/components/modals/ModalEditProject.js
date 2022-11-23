@@ -109,7 +109,7 @@ return ReactDOM.createPortal(
                     <Form.Check 
                       type="switch"
                       id="state"
-                      label="Enviar"
+                      label="Cadastramento concluído"
                       onChange={(e) => state=e.target.value}
                     />
                   )}

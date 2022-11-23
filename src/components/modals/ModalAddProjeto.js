@@ -29,10 +29,11 @@ function ModalAddProjeto (props) {
 
   // const [inputs, setInputs] = useState({});
   // const [validated, setValidated] = useState(false);
-
+  var state = "rascunho";
   // const [projectOwner, setOwner] = useState("");
   // const [projectApprove, setApprove] = useState("");
   const [projectName, setName] = useState("");
+
   const [projectDescription, setDescription] = useState("");
   // const [projectDocumentation, setDocumentation] = useState("");
   // const [projectHashDocumentation, setHashDocumentation] = useState("");
@@ -91,7 +92,10 @@ function ModalAddProjeto (props) {
     var current = moment()
       .utcOffset('-03:00')
       .format('DD/MM/YYYY hh:mm:ss a');
-       
+    
+    if (state == "on"){
+        state = "enviado";
+    }
     
     let formdata = new FormData(); 
     formdata.append('file', file);
@@ -102,8 +106,7 @@ function ModalAddProjeto (props) {
       }
     }
    
-    console.log('formdata->', formdata);
-
+    
     var transactions_result = await api.post("/upload", formdata, headers);
 
     block = {
@@ -155,7 +158,7 @@ return ReactDOM.createPortal(
                 )}
               />
               {errors.name && (
-                <div class="invalid-feedback">
+                <div className="invalid-feedback">
                   <Form.Control.Feedback type="invalid">
                     O campo descrição é requerido
                   </Form.Control.Feedback>
@@ -180,7 +183,7 @@ return ReactDOM.createPortal(
                 )}
               />
               {errors.description && (
-                <div class="invalid-feedback">
+                <div className="invalid-feedback">
                   <Form.Control.Feedback type="invalid">
                     O campo name é requerido
                   </Form.Control.Feedback>
@@ -188,11 +191,11 @@ return ReactDOM.createPortal(
               )}
             </Form.Group>
             <Form.Group as={Col} md="20" controlId="validationCustom01">
-              <Form.Label>Documentação</Form.Label>
+              <Form.Label>Documentação</Form.Label><br></br>
               <input type="file" name="documentation" onChange={e => setFile(e.target.files[0])} />
             </Form.Group>
             <Form.Group as={Col} md="20" controlId="validationCustom01">
-              <Form.Label>Area</Form.Label>
+              <Form.Label>Área em hectares</Form.Label>
               <Controller
                 name="area"
                 control={control}
@@ -208,7 +211,7 @@ return ReactDOM.createPortal(
                 )}
               />
               {errors.area && (
-                <div class="invalid-feedback">
+                <div className="invalid-feedback">
                   <Form.Control.Feedback type="invalid">
                     O campo name é requerido
                   </Form.Control.Feedback>
@@ -226,7 +229,7 @@ return ReactDOM.createPortal(
             </div>
           </form>
         </div>
-        <div class="modal-footer">
+        <div className="modal-footer">
         </div>
       </div>
 

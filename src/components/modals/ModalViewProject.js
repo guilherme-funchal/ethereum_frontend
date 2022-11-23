@@ -54,7 +54,7 @@ return ReactDOM.createPortal(
 
         </tr> 
         <tr>
-        <td><b>Hash doc</b></td>
+        <td><b>Hash documento</b></td>
         <td>{props.items[0].hash_documentation}</td>   
         </tr> 
         <tr>

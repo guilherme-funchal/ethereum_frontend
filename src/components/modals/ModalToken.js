@@ -222,7 +222,7 @@ const ModalToken = props => {
                       <Form.Check
                         {...field}
                         type="radio"
-                        label="Carbono"
+                        label="Crédito Carbono"
                         id={`inline-1`}
                         value="1"
                         placeholder="Tipo"

@@ -87,7 +87,7 @@ export default function Dashboard(props) {
           <div className="info-box">
             <span className="info-box-icon bg-success"><i className="ion ion-leaf"></i></span>
             <div className="info-box-content">
-              <span className="info-box-text">Saldo Carbono</span>
+              <span className="info-box-text">Saldo crédito de Carbono</span>
               <span className="info-box-number">{props.carbono}</span>
             </div>
 
@@ -111,7 +111,7 @@ export default function Dashboard(props) {
           <div className="info-box">
             <span className="info-box-icon bg-primary"><i className="ion ion-leaf"></i></span>
             <div className="info-box-content">
-              <span class="info-box-text">Taxa de conversão carbono</span>
+              <span class="info-box-text">Tx conversão HEC em CC</span>
               <span className="info-box-number">{props.taxas.data?.carbono}</span>
             </div>
 
@@ -123,7 +123,7 @@ export default function Dashboard(props) {
           <div className="info-box">
             <span className="info-box-icon bg-warning"><i className="far fa-star"></i></span>
             <div className="info-box-content">
-              <span className="info-box-text">Taxa de conversão Moeda</span>
+              <span className="info-box-text">Tx conversão CC em Moeda</span>
               <span className="info-box-number">{props.taxas.data?.moeda}</span>
             </div>
 
@@ -176,11 +176,11 @@ export default function Dashboard(props) {
                 <th><center>Valor</center></th>
                 <th><center>Tipo</center></th>
                 <th><center>Timestamp</center></th>
-                <If condition={profile === "comprador"}>
+                {/* <If condition={profile === "comprador"}>
                   <Then>
                     <th><center>Aposentar</center></th>
                   </Then>
-                </If>
+                </If> */}
               </tr>
             </thead>
             <tbody>
@@ -258,31 +258,15 @@ export default function Dashboard(props) {
                         <td><center>{id}</center></td>
                         <td><center><button className="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber); }}
                         ><i className="fa fa-clock fa-fw" style={{ fontSize: "15px" }}></i></button></center></td>
-                        <If condition={aposentar === true}>
-                          <Then>
-                          <td><center><Button className="btn btn-default" rounded variant="success" size="sm" onClick={() => aposentarCredito(to, value)}>Aposentar</Button></center></td>
-                          </Then>
-                        </If>
                       </tr>
                     </Then>
                   </If>
                 );
+                
               })}
-
             </tbody>
           </table>
         </div>
-        {/* <div className="col-lg-3 col-6">
-          <div className="small-box bg-success">
-            <div className="inner">
-              <h3>{transactions.length}</h3>
-              <p>Transações</p>
-            </div>
-            <div className="icon">
-              <i className="ion ion-stats-bars" />
-            </div>
-          </div>
-        </div> */}
       </section>
 
     </div>

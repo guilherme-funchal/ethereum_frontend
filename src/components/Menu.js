@@ -188,7 +188,7 @@ export default function Child( {
                         }}>
                         <i className="nav-icon fas fa  fa-sort" />
                         <p>
-                          Webcommerce
+                           Plataforma
                         </p>
                       </a>
                     </li>

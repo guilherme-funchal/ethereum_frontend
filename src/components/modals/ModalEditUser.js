@@ -12,10 +12,10 @@ import moment from "moment";
 function ModalEditUser (props) {
 
   const [userName, setName] = useState("");
-  const [userProfile, setProfile] = useState("");
+  const [userProfile, setProfile] = useState(props.items[0].profile);
   const [userDesc, setDesc] = useState("");
   const [userEmail, setEmail] = useState("");
-  const [userType, setType] = useState("");
+  const [userType, setType] = useState(props.items[0].type);
   const [userDoc, setDoc] = useState("");
   const [userId, setUserId] = useState("");
 
@@ -111,11 +111,11 @@ function ModalEditUser (props) {
        
     var block = {
       "user_id": user_id,
-      "profile": profile,
+      "profile": userProfile,
       "desc": desc,
       "name": name,
       "email": email,
-      "type": type,
+      "type": userType,
       "doc": doc,
       "created_at": created_at,
       "updated_at": current,
@@ -168,17 +168,21 @@ return ReactDOM.createPortal(
                 onChange={(e) => desc=e.target.value}
               />  
           </Form.Group>
-          <Form.Group as={Col} md="20" >
-              <Form.Label>Perfil</Form.Label>
-              <Form.Control
-                type="text"
-                id="profile"
-                name="profile"
-                defaultValue={props.items[0].profile}
-                placeholder="profile"
-                onChange={(e) => profile=e.target.value}
-              />  
-          </Form.Group>
+          <Form.Group as={Col} md="20" controlId="validationCustom01">
+                <Form.Label>Profile</Form.Label><br></br>
+                {/* <Select
+                defaultValue={selectedOption}
+                onChange={setSelectedOption}
+                options={options}
+              /> */}
+                <select name="profile" value={profile} onChange={texto => setProfile(texto.target.value)}>
+                  <option value="">Selecione um perfil</option>
+                  <option value="certificador">Certificador</option>
+                  <option value="registrador">Registrador</option>
+                  <option value="propositor">Propositor</option>
+                  <option value="comprador">Comprador</option>
+                </select><br /><br />
+          </Form.Group>      
           <Form.Group as={Col} md="20" >
               <Form.Label>Email</Form.Label>
               <Form.Control
@@ -190,17 +194,14 @@ return ReactDOM.createPortal(
                 onChange={(e) => email=e.target.value}
               />  
           </Form.Group>
-          <Form.Group as={Col} md="20" >
-              <Form.Label>Tipo</Form.Label>
-              <Form.Control
-                type="text"
-                id="type"
-                name="type"
-                defaultValue={props.items[0].type}
-                placeholder="type"
-                onChange={(e) => type=e.target.value}
-              />  
-          </Form.Group>
+          <Form.Group as={Col} md="20" controlId="validationCustom01">
+                <Form.Label>Tipo</Form.Label><br></br>
+                <select name="type" value={type} onChange={tipo => setType(tipo.target.value)}>
+                  <option value="">Selecione um tipo</option>
+                  <option value="pf">Pesssoa física</option>
+                  <option value="pj">Pessoa Jurídica</option>
+                </select><br /><br />
+              </Form.Group>  
           <Form.Group as={Col} md="20" >
               <Form.Label>Documento(CPF - RG -CNPJ)</Form.Label>
               <Form.Control

@@ -214,7 +214,7 @@ export default function Usuarios(props) {
           <div className="small-box bg-success">
             <div className="inner">
             <h3>{props.taxas.data.carbono}</h3>
-            <p>Taxa de conversão de Carbono</p>
+            <p>Taxa de conversão de Hectares em crédito de carbono</p>
             </div>
             <div className="icon">
               <i className="ion ion-bag"></i>
@@ -226,7 +226,7 @@ export default function Usuarios(props) {
           <div className="small-box bg-warning">  
             <div className="inner">
               <h3>{props.taxas.data.moeda}</h3>
-              <p>Taxa de conversão de Moeda</p>
+              <p>Taxa de conversão de crédito de carbono em moeda</p>
             </div>
             <div className="icon">
               <i className="ion ion-bag"></i>

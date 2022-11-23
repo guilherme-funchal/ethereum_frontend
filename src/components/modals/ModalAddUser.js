@@ -125,18 +125,17 @@ function ModalAddUser(props) {
 
     const id = await api.get('account-lists/list');
 
-
     response = await api.delete('account-lists/delete/' + id.data[0].user_id);
 
     const form = data.currentTarget;
 
     const block = {
       "user_id": id.data[0].user_id,
-      "profile": selectedOption,
+      "profile": userProfile,
       "desc": data.desc,
       "name": data.name,
       "email": data.email,
-      "type": data.type,
+      "type": userType,
       "doc": data.doc,
       "created_at": current,
       "updated_at": current,
@@ -144,7 +143,7 @@ function ModalAddUser(props) {
     };
 
     console.log("block->", block);
-    console.log("profile->", selectedOption);
+    console.log("profile->", userProfile);
 
     response = await api.post('account/add/', block);
 
@@ -220,11 +219,18 @@ function ModalAddUser(props) {
               </Form.Group>
               <Form.Group as={Col} md="20" controlId="validationCustom01">
                 <Form.Label>Profile</Form.Label><br></br>
-              <Select
+                {/* <Select
                 defaultValue={selectedOption}
                 onChange={setSelectedOption}
                 options={options}
-              />
+              /> */}
+                <select name="profile" value={profile} onChange={texto => setProfile(texto.target.value)}>
+                  <option value="">Selecione um perfil</option>
+                  <option value="certificador">Certificador</option>
+                  <option value="registrador">Registrador</option>
+                  <option value="propositor">Propositor</option>
+                  <option value="comprador">Comprador</option>
+                </select><br /><br />
               </Form.Group>
               <Form.Group as={Col} md="20" controlId="validationCustom01">
                 <Form.Label>Email</Form.Label>
@@ -251,8 +257,14 @@ function ModalAddUser(props) {
                 )}
               </Form.Group>
               <Form.Group as={Col} md="20" controlId="validationCustom01">
-                <Form.Label>Tipo</Form.Label>
-                <Controller
+                <Form.Label>Tipo</Form.Label><br></br>
+                <select name="type" value={type} onChange={tipo => setType(tipo.target.value)}>
+                  <option value="">Selecione um tipo</option>
+                  <option value="pf">Pesssoa física</option>
+                  <option value="pj">Pessoa Jurídica</option>
+                </select><br /><br />
+              </Form.Group>  
+                {/* <Controller
                   name="type"
                   control={control}
                   onChange={(e) => setType(e.target.value)}
@@ -273,7 +285,7 @@ function ModalAddUser(props) {
                     </Form.Control.Feedback>
                   </div>
                 )}
-              </Form.Group>
+              </Form.Group> */}
               <Form.Group as={Col} md="20" controlId="validationCustom01">
                 <Form.Label>Documento(CPF - RG -CNPJ)</Form.Label>
                 <Controller

@@ -23,19 +23,19 @@ export default function App() {
     const address = localStorage.getItem('wallet');
     readUser(address);
 
-    setWallet(address);  
+    setWallet(address);
     const moeda = doSaldoMoeda();
     const carbono = doSaldoCarbono();
     const taxas = doTaxas();
 
     moeda
-    .then((value) => {
-      setBalanceMoeda(value);
-    })
-    .catch((err) => {
-      console.log(err); 
-    });
-    
+      .then((value) => {
+        setBalanceMoeda(value);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     // taxas
     // .then((value) => {
     //   setTaxas(value);
@@ -45,18 +45,18 @@ export default function App() {
     // });
 
     carbono
-    .then((value) => {
-      setBalanceCarbono(value);
-    })
-    .catch((err) => {
-      console.log(err); 
-    });
-    
+      .then((value) => {
+        setBalanceCarbono(value);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     const resultado = doTransacoes();
 
     var promise = Promise.resolve(resultado);
-    
-    promise.then(function(val) {
+
+    promise.then(function (val) {
       setTransactions(val);
     });
 
@@ -66,31 +66,33 @@ export default function App() {
   }, [])
 
 
-  
+
   const [error, setError] = useState('');
   const [wallet, setWallet] = useState('');
   const [user, setUser] = useState('');
+  const [email, setEmail] = useState('');
+  const [profile, setProfile] = useState('');
   const [transactions, setTransactions] = useState(['']);
   const [moeda, setBalanceMoeda] = useState('');
   const [carbono, setBalanceCarbono] = useState('');
   const [timestamp, setTimestamp] = useState('');
   const [showModalTransf, setShow] = useState(false);
-  const handleClose = () => setShow(false); 
-  const handleTimestamp = () => setTimestamp(true); 
+  const handleClose = () => setShow(false);
+  const handleTimestamp = () => setTimestamp(true);
   const MySwal = withReactContent(Swal)
 
   //Show Modal Form
   const [showModalToken, setShowModalToken] = useState(false);
   const handleShowModalToken = () => setShowModalToken(true);
-  
+
   const [showModalTransfer, setShowModalTransfer] = useState(false);
   const handleShowModalTransfer = () => setShowModalTransfer(true);
-  
+
 
   const [showProjects, setShowProjects] = useState(false);
   const handleShowProjects = () => setShowProjects(true);
   const handleHideProjects = () => setShowProjects(false);
- 
+
   const [showUsuarios, setShowUsuarios] = useState(false);
   const handleShowUsuarios = () => setShowUsuarios(true);
   const handleHideUsuarios = () => setShowUsuarios(false);
@@ -104,13 +106,13 @@ export default function App() {
   const handleHideWebcommerce = () => setShowWebcommerce(false);
 
   const [taxas, setTaxas] = useState('');
-    
+
   async function doTaxas() {
     var response = await api.get('tax/list');
     await setTaxas(response);
   }
 
-  async function doOwner(){
+  async function doOwner() {
     var response = await api.get('dono');
     var dono = response.data
     MySwal.fire({
@@ -120,39 +122,41 @@ export default function App() {
     })
   }
 
-  async function readUser(pk){
+  async function readUser(pk) {
     var response = await api.get('account/find/' + pk);
-    setUser(response); 
+    setUser(response);
+    setEmail(response.data[0].email);
+    setProfile(response.data[0].profile);
   }
-  
-  async function doSaldoCarbono(){
+
+  async function doSaldoCarbono() {
     var conta = localStorage.getItem('wallet');
-    if (conta){
+    if (conta) {
       var response = await api.get('saldo?conta=' + conta + '&wallet=1');
       var carbono = response.data;
       carbono = parseFloat(carbono);
-      carbono = carbono.toLocaleString('pt-br', {minimumFractionDigits: 2});
+      carbono = carbono.toLocaleString('pt-br', { minimumFractionDigits: 2 });
       return carbono;
     }
   }
 
-  async function doSaldoMoeda(){
+  async function doSaldoMoeda() {
     var conta = localStorage.getItem('wallet');
-    if (conta){
+    if (conta) {
       var response = await api.get('saldo?conta=' + conta + '&wallet=0');
       var moeda = response.data;
       moeda = parseFloat(moeda);
-      moeda = moeda.toLocaleString('pt-br', {minimumFractionDigits: 2});
+      moeda = moeda.toLocaleString('pt-br', { minimumFractionDigits: 2 });
       return moeda;
-    }  
+    }
   }
 
-  async function doTimestamp(param){
+  async function doTimestamp(param) {
     const block = { block: param };
     const response = await api.post('carimbo', block);
     var timestamp_result = response.data;
     var date = new Date(timestamp_result * 1000);
-    var resultado = date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+    var resultado = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
     setTimestamp(resultado);
     MySwal.fire({
       title: <strong>Timestamp do Bloco</strong>,
@@ -160,19 +164,19 @@ export default function App() {
       icon: 'info'
     });
   }
-  
 
-  async function WalletAtual(){
+
+  async function WalletAtual() {
     const found = readUser(wallet);
 
-    var html = 
-    '<p className="text-left small"><b>Wallet : </b><span>' + user.data[0].user_id + '</span></p>' + 
-    '<p className="text-left small"><b>Nome : </b><span>' + user.data[0].name + '</span></p>' + 
-    '<p className="text-left small"><b>Perfil : </b><span>' + user.data[0].profile + '</span></p>' + 
-    '<p className="text-left small"><b>Descrição : </b><span>' + user.data[0].desc + '</span></p>' + 
-    '<p className="text-left small"><b>Email: </b><span>' + user.data[0].email + '</span></p>'
-    
-    if (user.type === 'pj'){
+    var html =
+      '<p className="text-left small"><b>Wallet : </b><span>' + user.data[0].user_id + '</span></p>' +
+      '<p className="text-left small"><b>Nome : </b><span>' + user.data[0].name + '</span></p>' +
+      '<p className="text-left small"><b>Perfil : </b><span>' + user.data[0].profile + '</span></p>' +
+      '<p className="text-left small"><b>Descrição : </b><span>' + user.data[0].desc + '</span></p>' +
+      '<p className="text-left small"><b>Email: </b><span>' + user.data[0].email + '</span></p>'
+
+    if (user.type === 'pj') {
       html = html + '<p className="text-left small"><b>CNPJ: </b><span>' + user.data[0].doc + '</span></p>'
     } else {
       html = html + '<p className="text-left small"><b>CPF: </b><span>' + user.data[0].doc + '</span></p>'
@@ -184,27 +188,27 @@ export default function App() {
     });
   }
 
-  async function doTransacoes(){
-    var wallet = localStorage.getItem('wallet'); 
-    if (wallet){
+  async function doTransacoes() {
+    var wallet = localStorage.getItem('wallet');
+    if (wallet) {
       const response = await api.get('transacoes');
       var transactions_result = (await response).data;
       return transactions_result;
     } else {
       return transactions_result = "";
-    } 
+    }
   }
 
   async function doSignIn() {
-  //   alert('Logado');
-  // window.location.reload(false);
+    //   alert('Logado');
+    // window.location.reload(false);
   }
-  
+
   function refreshPage() {
     window.location.reload(false);
   }
 
-  async function doLogout(){
+  async function doLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('wallet');
     setWallet('');
@@ -216,24 +220,24 @@ export default function App() {
     setTimestamp('');
     window.location.reload(false);
   }
-  
-  async function doSignUp(){
+
+  async function doSignUp() {
     setError('');
-  
+
     if (!window.ethereum) return MySwal.fire(<p><h6><b>Carteira não encontrada</b></h6></p>);
-  
+
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const accounts = await provider.send("eth_requestAccounts", []);
       if (!accounts || !accounts.length) return MySwal.fire(<p><h6><b>Carteira não encontrada</b></h6></p>);
       localStorage.setItem('wallet', accounts[0]);
       window.location.reload(false);
-    }catch(err){
+    } catch (err) {
       setError(err.message);
     }
   }
 
-  async function doSignUpDirect(){
+  async function doSignUpDirect() {
     setError('');
     const { value: wallet } = await Swal.fire({
       title: 'Insira a sua chave',
@@ -242,124 +246,130 @@ export default function App() {
       inputLabel: '',
       inputPlaceholder: 'Entre sua chave privada'
     })
-    
+
     if (wallet) {
       localStorage.setItem('wallet', wallet);
       refreshPage();
     }
   }
-  
+
   return (
     <div className="wrapper">
       <header>
-      <div>
-        <nav className="main-header navbar navbar-expand navbar-white navbar-light navbar-right">
-        <ul className="navbar-nav ml-auto">
-                  {
-                    
-          !wallet
-            ? (
-              <>
-              <div className="topnav-right">
-              <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUpDirect}> 
-                <i className="fa fa-paper-plane fa-1" />
-              </a>
-              </div>
-              <div className="topnav-right">
-              <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUp}> 
-                <i className="fa fa-lock" />
-              </a>
-              </div>
-              </>
-            )
-            : (
-              <>
-              <div className="topnav-right">
-                
-              <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doLogout}> 
-                <i className="fa fa-unlock-alt" />
-              </a>
-              </div>
-              </>
-            )
-        }
-        {
-            error ? <p>{error}</p> : <></>
-        }
-        </ul>
-        </nav>
-      </div>
+        <div>
+          <nav className="main-header navbar navbar-expand navbar-white navbar-light navbar-right">
+            <ul className="navbar-nav ml-auto">
+              {
+
+                !wallet
+                  ? (
+                    <>
+                      <div className="topnav-right">
+                        <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUpDirect}>
+                          <i className="fa fa-paper-plane fa-1" />
+                        </a>
+                      </div>
+                      <div className="topnav-right">
+                        <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUp}>
+                          <i className="fa fa-lock" />
+                        </a>
+                      </div>
+                    </>
+                  )
+                  : (
+                    <>
+                      <div className="topnav-right">
+
+                        <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doLogout}>
+                          <i className="fa fa-unlock-alt" />
+                        </a>
+                      </div>
+                    </>
+                  )
+              }
+              {
+                error ? <p>{error}</p> : <></>
+              }
+            </ul>
+          </nav>
+        </div>
       </header>
       <div>
         <aside className="main-sidebar sidebar-dark-primary elevation-4">
           {/* Brand Logo */}
-          <a href="http://localhost:3000" className="brand-link">
-            <span className="brand-text font-weight-light">Dapp Carbono</span>
-          </a>
+          <div className="user-panel mt-3 pb-3 mb-3 d-flex">
+            {/* <div class="image">
+              <img src="" class="img-circle elevation-2" alt="User Image">
+            </div> */}
+            <div className="text-white"><center>Usuário : {email}</center>
+            </div>
+            
+          </div>
+          
           {/* Sidebar */}
           <div className="sidebar">
             {/* Sidebar user panel (optional) */}
             <div className="user-panel mt-3 pb-3 mb-3 d-flex">
               <div className="info">
                 <p className="text-white">Carteira Metamask <button id="btn1" className="btn text-light" onClick={WalletAtual}><i className="fas fa fa-info" />
-              </button>
-              <button id="btn2" className="btn text-light" onClick={doOwner}><i className="fas fa fa-university" /></button></p>
-              
+                </button>
+                  <button id="btn2" className="btn text-light" onClick={doOwner}><i className="fas fa fa-university" /></button></p>
+                  {/* <div class="text-white"><h6>Perfil:</h6> {profile}</div> */}
               </div>
             </div>
-            
 
-            <Menu 
-            handleShowModalToken={handleShowModalToken} 
-            handleShowModalTransfer={handleShowModalTransfer} 
-            handleShowProjects={handleShowProjects} 
-            handleShowUsuarios={handleShowUsuarios} 
-            handleHideProjects={handleHideProjects}
-            handleHideUsuarios={handleHideUsuarios}
-            handleHideDashboard={handleHideDashboard}
-            handleShowDashboard={handleShowDashboard}
-            handleShowWebcommerce={handleShowWebcommerce}
-            handleHideWebcommerce={handleHideWebcommerce}
+
+            <Menu
+              handleShowModalToken={handleShowModalToken}
+              handleShowModalTransfer={handleShowModalTransfer}
+              handleShowProjects={handleShowProjects}
+              handleShowUsuarios={handleShowUsuarios}
+              handleHideProjects={handleHideProjects}
+              handleHideUsuarios={handleHideUsuarios}
+              handleHideDashboard={handleHideDashboard}
+              handleShowDashboard={handleShowDashboard}
+              handleShowWebcommerce={handleShowWebcommerce}
+              handleHideWebcommerce={handleHideWebcommerce}
             />
-            
-            </div>
-          </aside> 
-      
-    <Modal1 title="Gerar Tokens" onClose={() => {setShowModalToken(false); refreshPage();}} show={showModalToken} >
-    </Modal1>
-    <Modal2 title="Realizar transferências" onClose={() => {setShowModalTransfer(false); refreshPage();}} show={showModalTransfer} >
-    </Modal2>                
-  
-  </div>
+
+          </div>
+        </aside>
+
+        <Modal1 title="Gerar Tokens" onClose={() => { setShowModalToken(false); refreshPage(); }} show={showModalToken} >
+        </Modal1>
+        <Modal2 title="Realizar transferências" onClose={() => { setShowModalTransfer(false); refreshPage(); }} show={showModalTransfer} >
+        </Modal2>
+
+      </div>
       {
-    
-      wallet
-            ? (
-            <>   
-            <If condition={showProjects == true}>
-            <Then>
-              <Projetos taxas={taxas} user={user}/>
-            </Then>
-            <ElseIf condition={showUsuarios == true}>
-            <Usuarios taxas={taxas} />              
-            </ElseIf>   
-            <ElseIf condition={showDashboard == true}>
-              <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} taxas={taxas} setTimestamp={setTimestamp}/>
-            </ElseIf>
-            <ElseIf condition={showWebcommerce == true}>
-            <Webcommerce taxas={taxas} />              
-            </ElseIf>
-           </If>   
+
+        wallet
+          ? (
+            <>
+              <If condition={showProjects == true}>
+                <Then>
+                  <Projetos taxas={taxas} user={user} />
+                </Then>
+                <ElseIf condition={showUsuarios == true}>
+                  <Usuarios taxas={taxas} />
+                </ElseIf>
+                <ElseIf condition={showDashboard == true}>
+                  <Dashboard wallet={wallet} moeda={moeda} carbono={carbono} transactions={transactions} taxas={taxas} setTimestamp={setTimestamp} />
+                </ElseIf>
+                <ElseIf condition={showWebcommerce == true}>
+                  <Webcommerce taxas={taxas} moeda={moeda} carbono={carbono} />
+                </ElseIf>
+              </If>
             </>
-            )
-            : (
-            <>  
-              <Welcome />  
-              <Footer wallet={wallet} moeda={moeda}/>
+          )
+          : (
+            <>
+              <Welcome />
+              <Footer wallet={wallet} moeda={moeda} />
             </>
-            )     
+          )
       }
-      
-  </div>
+
+    </div>
   );
 }
