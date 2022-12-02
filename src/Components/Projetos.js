@@ -108,7 +108,7 @@ export default function Projetos(){
 
     async function delProjeto(id) {
         Swal.fire({
-          title: 'Deseja excluir a conta?',
+          title: 'Deseja excluir o projeto?',
           text: "",
           icon: 'question',
           showCancelButton: true,
@@ -124,9 +124,9 @@ export default function Projetos(){
               icon: 'success',
               title: 'Projeto excluído'
             });
+            navigate(0);
           }
-          getProjetos();
-          forceUpdate();
+          
         })
       }
 
@@ -183,8 +183,6 @@ export default function Projetos(){
         "state": state,
         "area": response.data[0].area,
         "creditAssigned": String(creditAssigned),
-        "creationDate": response.data[0].creationDate,
-        "retired": response.data[0].retired,
         "updateDate": String(current)
       };
   
@@ -272,26 +270,28 @@ export default function Projetos(){
                 projetos.map((data) => {
                   var test = true;
                   var visible = false;
-
-                  if (user[0]?.profile === "certificador" || user[0]?.profile === "registrador" || user[0]?.user_id === data.projectOwner) {
-                    visible = true;
-                  }
-
-                  if (data.state === 'concluido' || data.state === 'enviado' && user[0]?.profile === "propositor") {
-                    test = false;
-                  }
-
                   var propositor = false;
                   var certificador = false;
                   var registrador = false;
-                  var aposentado = "";
+
+                  if (user[0]?.profile === "certificador" || user[0]?.profile === "registrador" || user[0]?.user_id === data.projectOwner || user[0]?.user_id === data.projectCreator) {
+                    visible = true;
+                  }
+
+                  if (data.state === 'adquirido' || data.state === 'concluido' || data.state === 'enviado' && user[0]?.profile === "propositor") {
+                    test = false;
+                  }
+
+                  if (data.state === 'aposentado' && user[0]?.profile === "propositor") {
+                    test = false;
+                  }
 
                   if (user[0]?.profile === "certificador" && data.state === 'enviado') {
                     certificador = true;
                   }
 
                   if (user[0]?.profile === "registrador" && data.state === 'enviado') {
-                    certificador = true;
+                    registrador = true;
                   }
 
                   if (user[0]?.profile === "propositor") {
@@ -302,15 +302,8 @@ export default function Projetos(){
                     registrador = true;
                   }
 
-                  if (data.retired === 'false'){
-                    aposentado = 'Não';
-                  } else {
-                    aposentado = 'Sim';
-                  }
-
                   const style = { width: '70px' }
 
-                  console.log('test->', test);
 
                   if (data.id !== '0') {
                     return (
@@ -357,7 +350,7 @@ export default function Projetos(){
                                       </If>
                                     </Then>
                                   </If>
-                                  <Button style={style} className="btn btn-default" rounded variant="primary" size="sm" name="teste" onClick={() => viewProjeto(data.id)}>Ver</Button>
+                                  {/* <Button style={style} className="btn btn-default" rounded variant="success" size="sm" name="teste" onClick={() => viewProjeto(data.id)}>Ver</Button> */}
                                 </div></center></td>
                               </Then>
                             </If>
@@ -375,7 +368,7 @@ export default function Projetos(){
               Adicionar
             </Button>
 
-            <ModalAddProject toggle={toggle} keyboard={false} projectOwner={user[0]?.user_id} backdrop={"static"} title="Adicionar projeto" onClose={() => { getProjetos(); forceUpdate(); setItems(' '); setShowModalAddProject(false); }} show={showModalAddProjeto}>
+            <ModalAddProject setShowModalAddProject={setShowModalAddProject} toggle={toggle} keyboard={false} projectOwner={user[0]?.user_id} backdrop={"static"} title="Adicionar projeto" onClose={() => { setShowModalAddProject(false); getProjetos(); forceUpdate(); setItems(' ');}} show={showModalAddProjeto}>
             </ModalAddProject>
             <ModalViewProject title="Dados do Projeto" items={items} onClose={() => { setShowModalViewProject(false); }} show={showModalViewProject}>
             </ModalViewProject>

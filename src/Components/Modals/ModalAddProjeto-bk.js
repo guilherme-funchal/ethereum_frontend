@@ -68,8 +68,6 @@ function ModalAddProjeto (props) {
       state: "",
       area: "",
       creditAssigned: "",
-      creationDate: "",
-      retired: "",
       updateDate: ""
     },
   });
@@ -86,6 +84,8 @@ function ModalAddProjeto (props) {
     //     state = "enviado";
     // }
     
+    console.log("state->", state);
+
     let formdata = new FormData(); 
     formdata.append('file', file);
 
@@ -111,7 +111,7 @@ function ModalAddProjeto (props) {
       "creditAssigned": "0",
       "updateDate": String(current)
     };
-
+    console.log('Block->', block);
     response = await Api.post('/projeto', block);
     props.onClose();
   }

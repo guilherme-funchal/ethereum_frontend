@@ -32,6 +32,7 @@ function ModalEditUser (props) {
   var email = props.items[0].email;
   var type = props.items[0].type;
   var doc = props.items[0].doc;
+  var image = props.items[0].image;
   var created_at = props.items[0].created_at;
   var last_login = props.items[0].last_login;
 
@@ -96,7 +97,8 @@ function ModalEditUser (props) {
       doc: "",
       created_at: "",
       updated_at: "",
-      last_login: ""
+      last_login: "",
+      image: ""
     },
   });
 
@@ -119,7 +121,8 @@ function ModalEditUser (props) {
       "doc": doc,
       "created_at": created_at,
       "updated_at": current,
-      "last_login": last_login
+      "last_login": last_login,
+      "image": image
     };
 
     response = await api.patch('account/' + user_id, block);
@@ -211,6 +214,17 @@ return ReactDOM.createPortal(
                 defaultValue={props.items[0].doc}
                 placeholder="type"
                 onChange={(e) => doc=e.target.value}
+              />  
+          </Form.Group>
+          <Form.Group as={Col} md="20" >
+              <Form.Label>Imagem</Form.Label>
+              <Form.Control
+                type="text"
+                id="image"
+                name="image"
+                defaultValue={props.items[0].image}
+                placeholder="imagem"
+                onChange={(e) => image=e.target.value}
               />  
           </Form.Group>
             <br></br>

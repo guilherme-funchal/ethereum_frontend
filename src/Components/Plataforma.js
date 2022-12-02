@@ -10,6 +10,7 @@ import ModalViewUser from "./Modals/ModalViewUser";
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from "moment";
+import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
 
 export default function Plataforma() {
   const Sucesso = Swal.mixin({
@@ -53,7 +54,7 @@ export default function Plataforma() {
     setProjetos(response.data);
   };
 
-  const style = { width: '70px' }
+  const style = { width: '90px' }
   const [taxas, setTaxas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [user, setUser] = useState([]);
@@ -79,100 +80,133 @@ export default function Plataforma() {
   });
 
   async function doTransfer(origem, destino, id, valor) {
-    var block = ""
-    block = {
+    var block = {
       "from": String(origem),
       "to": String(destino),
       "id": String(id),
-      "amount": String(valor)
+      "amount": String(valor),
+      "data": "0x"
     };
-    // const response = await Api.post('transferir', block);
-    // navigate("/plataforma");
-    // navigate(0);
-  }
 
-  async function updateProject(project_id, comprador){
-    await EditItemsProject(project_id);
+    console.log("block->", block);
+    const response = await Api.post('transferir', block);
+    if (response.status === 200){
+      return true;
+    } else  {
+      return false;
+    }
+  }
+  
+  const updateProject = async (project_id, comprador) => {
+    var result = await Api.get('projeto?id=' + project_id);
 
     var current = moment()
       .utcOffset('-03:00')
       .format('DD/MM/YYYY hh:mm:ss a');
 
     var block = {
-      "id": items[0].id,
-      "name": items[0].name,
+      "id": result.data[0]?.id,
+      "name": result.data[0]?.name,
       "projectOwner": user[0]?.user_id,
-      "projectCreator": items[0].projectCreator,
-      "projectApprover": items[0].projectApprover,
-      "description": items[0].description,
-      "documentation": items[0].documentation,
-      "hash_documentation": items[0].hash_documentation,
+      "projectCreator": result.data[0]?.projectCreator,
+      "projectApprover": result.data[0]?.projectApprover,
+      "description": result.data[0]?.description,
+      "documentation": result.data[0]?.documentation,
+      "hash_documentation": result.data[0]?.hash_documentation,
       "state": "adquirido",
-      "area": items[0].area,
-      "creditAssigned": items[0].creditAssigned,
-      "creationDate": items[0].creationDate,
-      "retired": items[0].retired,
+      "area": result.data[0]?.area,
+      "creditAssigned": result.data[0]?.creditAssigned,
       "updateDate": String(current)
     };
+
     const response = await Api.patch('/projeto', block);
+
+    console.log("status:", response.status);
+
+    if (response.status === 200){
+      return true;
+    } else  {
+      return false;
+    }
+
   }
 
 
-  async function exeTransfer(vendedor, comprador, credito, moeda){
-    await doTransfer(vendedor, comprador, 1, credito);
-    await doTransfer(comprador, vendedor, 0, moeda);
-    // await Toast.fire({
-    //   icon: 'success',
-    //   title: 'Crédito de Carbono adquirido'
-    // });
+  async function exeTransfer(vendedor, comprador, credito, moeda, project_id){
 
-    await Sucesso.fire({
+    var test = await  updateProject(project_id, comprador);
+
+    console.log('---->', test);
+
+    if (test === true) {
+      test = await doTransfer(comprador, vendedor, 0, moeda);
+    }
+
+    console.log('---->', test);
+
+    if (test === true) {
+      await doTransfer(vendedor, comprador, 1, credito);
+    }
+
+    if (test === true) {
+      await Sucesso.fire({
       icon: 'success',
       title: 'Crédito de Carbono adquirido'
     })
-
     navigate(0);
+    }
   }
+
   const getSaldos = async (wallet) => {
     const response_carbono = await Api.get('saldo?conta=' + wallet[0].user_id + '&wallet=1');
     var carbono = response_carbono.data;
     carbono = parseFloat(carbono);
-    // carbono = carbono.toLocaleString('pt-br', { minimumFractionDigits: 2 });
-    setCarbono(carbono);
+    await setCarbono(carbono);
     const response_moeda = await Api.get('saldo?conta=' + wallet[0].user_id + '&wallet=0');
     var moeda = response_moeda.data;
     moeda = parseFloat(moeda);
-    // moeda = moeda.toLocaleString('pt-br', { minimumFractionDigits: 2 });
-    setMoeda(moeda);
+    await setMoeda(moeda);
+  };
+  
+  const EditItemsProject = async (id) => {
+    const response = await Api.get('projeto?id=' + id);
+    setItems(response.data);
+  };
+  
+  const EditItemUser = async (user_id) => {
+    const response = await Api.get('account/find/' + user_id);
+    setItemsUser(response.data);
+  };
+  
+  const viewProjeto= async (id) => {
+    const response = await Api.get('projeto?id=' + id);
+    setItems(response.data);
+    setShowModalViewProject(true);
   };
 
-  async function EditItemsProject(id) {
-    var response = await Api.get('projeto?id=' + id);
-    setItems(response.data);
-  }
-
-  async function EditItemUser(user_id) {
-    var response = await Api.get('account/find/' + user_id);
-    setItemsUser(response.data);
-  }
-
-  async function viewProjeto(id) {
-    EditItemsProject(id);
-    setShowModalViewProject(true);
-  }
-
-  async function viewUser(user_id) {
+  const viewUser= async (user_id) => {
     EditItemUser(user_id);
     setShowModalViewUser(true);
+  };
+
+
+  async function exeAposentar(block1, block2){
+    const response2 = await Api.post('queimar', block1);
+    const response1 = await Api.patch('/projeto', block2);
+
+    Sucesso.fire({
+      icon: 'success',
+      title: 'Carbono aposentado'
+    });
+    navigate(0);
   }
 
-  async function aposentarCredito(user_id) {
+  async function aposentarCredito(id, saldoCarbono) {
+    var result = await Api.get('projeto?id=' + id);
 
-    const block = {
-      "account": user_id,
-      "id": 1,
-      "value": String(saldoCarbono)
-    };
+    var current = moment()
+      .utcOffset('-03:00')
+      .format('DD/MM/YYYY hh:mm:ss a');
 
     (async () => {
       const { value: text } = await Swal.fire({
@@ -190,14 +224,30 @@ export default function Plataforma() {
         }
       }).then((result) => {
         if (result.isConfirmed) {
-          var response = Api.post('queimar', block);
-          Sucesso.fire({
-            icon: 'success',
-            title: 'Carbono aposentado'
-          });
-          // forceUpdate();
-          // setCarbono("0,00");
-          // navigate(0);
+
+          const block1 = {
+            "account": String(user[0].user_id),
+            "id": 1,
+            "value": String(saldoCarbono)
+          };
+          
+          var block2 = {
+            "id": result.data[0]?.id,
+            "name": result.data[0]?.name,
+            "projectOwner": user[0]?.user_id,
+            "projectCreator": result.data[0]?.projectCreator,
+            "projectApprover": result.data[0]?.projectApprover,
+            "description": result.data[0]?.description,
+            "documentation": result.data[0]?.documentation,
+            "hash_documentation": result.data[0]?.hash_documentation,
+            "state": "aposentado",
+            "area": result.data[0]?.area,
+            "creditAssigned": result.data[0]?.creditAssigned,
+            "updateDate": String(current)
+          };
+
+          exeAposentar(block1, block2);
+
         } else if (result.isDenied) {
           Falha.fire({
             icon: 'error',
@@ -227,10 +277,7 @@ export default function Plataforma() {
       if (result.isConfirmed) {
         if (profile === "comprador") {
           if (saldoMoeda > moeda) {
-            updateProject(project_id, comprador);
-            exeTransfer(vendedor, comprador, credito, moeda)
-            doTransfer(vendedor, comprador, 1, credito);
-            doTransfer(comprador, vendedor, 0, moeda);
+            exeTransfer(vendedor, comprador, credito, moeda, project_id);
           } else {
             Swal.fire('Sem saldo para adquirir o crédito!', '', 'error');
           }
@@ -243,8 +290,6 @@ export default function Plataforma() {
       }
     })
   }
-
-
 
   useEffect(() => {
     var address = localStorage.getItem('wallet');
@@ -288,7 +333,7 @@ export default function Plataforma() {
                   <div className="icon">
                     <i className="ion ion-leaf" />
                   </div>
-                  <a href="#" className="small-box-footer" onClick={() => aposentarCredito(user[0].user_id)}>
+                  <a href="#" className="small-box-footer" onClick="">
                     Aposentar crédito carbono <i className="fas fa-arrow-circle-right"></i>
                   </a>
                 </div>
@@ -315,7 +360,9 @@ export default function Plataforma() {
                   <th><center>Projeto ID</center></th>
                   <th><center>Nome</center></th>
                   <th><center>Proprietário</center></th>
-                  <th><center>Crédito Carbono</center></th>
+                  <th><center>Criador</center></th>
+                  <th><center>Estado</center></th>
+                  <th><center>Crédito</center></th>
                   <th><center>Operação</center></th>
                 </tr>
               </thead>
@@ -325,15 +372,46 @@ export default function Plataforma() {
                 valor = parseFloat(valor);
                 valor = valor.toLocaleString('pt-br', { minimumFractionDigits: 2 });
 
+                var visible = true;
+                var adquirir = true;
+                var aposentar = false;
+                
+                if (data.projectOwner === "0x0000000000000000000000000000000000000000" || data.state === "enviado"){
+                  visible = false;
+                }
+
+                if (data.state === "adquirido" || data.state === "aposentado" || data.state === "enviado" ){
+                  adquirir = false;
+                }
+
+                if (data.state === "adquirido"){
+                  aposentar = true;
+                }
+
                   return (<tr>
                     <>
+                    <If condition={visible === true}>
+                      <Then>
                       <td onClick={() => viewProjeto(data.id)}><center>{data.id}</center></td>
                       <td onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
                       <td onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
+                      <td onClick={() => viewUser(data.projectCreator)}><center>{data.projectOwner}</center></td>
+                      <td onClick={() => viewProjeto(data.state)}><center>{data.state}</center></td>
                       <td onClick={() => viewProjeto(data.id)}><center>{valor}</center></td>
                       <td><center><div>
-                        <Button style={style} className="btn btn-default" rounded variant="primary" size="sm" name="teste" onClick={() => comprarCredito(data.id, data.projectOwner, data.creditAssigned)}>Comprar</Button>
+                      <If condition={adquirir === true}>
+                      <Then> 
+                      <Button style={style} className="btn btn-default" rounded variant="primary" size="sm" name="teste" onClick={() => comprarCredito(data.id, data.projectOwner, data.creditAssigned)}>Comprar</Button>
+                      </Then>
+                      </If>  
+                      <If condition={aposentar === true}>
+                      <Then> 
+                      <Button style={style} className="btn btn-default" rounded variant="success" size="sm" name="teste" onClick={() => aposentarCredito(data.id, data.creditAssigned)}>Aposentar</Button>
+                      </Then>
+                      </If>  
                       </div></center></td>
+                      </Then>
+                    </If>    
                     </>
                   </tr>
                   );

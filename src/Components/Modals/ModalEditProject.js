@@ -23,8 +23,6 @@ function ModalEditProjeto (props) {
   
   var state = props.items[0].state;
   var area = props.items[0].area;
-  var retired = props.items[0].retired;
-  var creationdate = props.items[0].creationDate;
   var area = props.items[0].area;
   var id = props.items[0].id;
   var name = props.items[0].name;
@@ -41,10 +39,6 @@ function ModalEditProjeto (props) {
 
   function resetForm() {
     document.getElementById("form").reset();
-  }
-
-  function atribuirValor(){
-    console.log('atribuir valor...')
   }
 
   // const reload = () => window.location.reload();
@@ -82,8 +76,6 @@ function ModalEditProjeto (props) {
       "state": state,
       "area": area,
       "creditAssigned": "0",
-      "creationDate": creationdate,
-      "retired": retired,
       "updateDate": String(current)
     };
 

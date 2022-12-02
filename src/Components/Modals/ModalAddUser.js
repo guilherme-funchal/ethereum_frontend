@@ -27,6 +27,7 @@ function ModalAddUser(props) {
   const [userEmail, setEmail] = useState("");
   const [userType, setType] = useState("");
   const [userDoc, setDoc] = useState("");
+  const [userImage, setImage] = useState("");
   const [userId, setUserId] = useState("");
   const [current, setCurrent] = useState("");
 
@@ -98,6 +99,7 @@ function ModalAddUser(props) {
   var doc = "";
   var created_at = "";
   var last_login = "";
+  var image = "";
 
   const {
     control,
@@ -114,7 +116,8 @@ function ModalAddUser(props) {
       doc: "",
       created_at: "",
       updated_at: "",
-      last_login: ""
+      last_login: "",
+      image: ""
     },
   });
 
@@ -134,7 +137,8 @@ function ModalAddUser(props) {
       "doc": data.doc,
       "created_at": current,
       "updated_at": current,
-      "last_login": current
+      "last_login": current,
+      "image": data.image
     };
 
     response = await Api.post('account/add/', block);
@@ -295,6 +299,30 @@ function ModalAddUser(props) {
                   )}
                 />
                 {errors.doc && (
+                  <div className="invalid-feedback">
+                    <Form.Control.Feedback type="invalid">
+                      O campo é requerido
+                    </Form.Control.Feedback>
+                  </div>
+                )}
+              </Form.Group>
+              <Form.Group as={Col} md="20" controlId="validationCustom01">
+                <Form.Label>Imagem</Form.Label>
+                <Controller
+                  name="image"
+                  control={control}
+                  onChange={(e) => setImage(e.target.value)}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Form.Control
+                      {...field}
+                      type="text"
+                      placeholder="imagem"
+                      isInvalid={errors.image}
+                    />
+                  )}
+                />
+                {errors.image && (
                   <div className="invalid-feedback">
                     <Form.Control.Feedback type="invalid">
                       O campo é requerido

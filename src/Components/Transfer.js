@@ -139,7 +139,8 @@ export default function Transfer() {
                 "from": origem,
                 "to": destino,
                 "id": tipo,
-                "amount": valor
+                "amount": valor,
+                "data": "0x"
              };
             
             var saldo = await Api.get('saldo?conta=' + origem + '&wallet=' + tipo); 
