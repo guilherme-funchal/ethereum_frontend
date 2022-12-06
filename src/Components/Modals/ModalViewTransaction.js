@@ -10,7 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
 import { Modal } from "bootstrap";
 
-function ModalViewProjeto(props) {
+function ModalViewTransaction(props) {
 
   const link = "http://localhost:3001/upload/" + props.items[0].documentation;
 
@@ -23,7 +23,10 @@ function ModalViewProjeto(props) {
   const [showModalViewUser, setShowModalViewUser] = useState(false);
   const [itemsUser, setItemsUser] = useState([' ']);
 
-  const style = { width: '650px' }
+  const style = { width: '660px' }
+
+  var value = parseFloat(props.items[0].creditAssigned);
+  value = value.toLocaleString('pt-br', { minimumFractionDigits: 2 });
 
 
   return ReactDOM.createPortal(
@@ -40,27 +43,18 @@ function ModalViewProjeto(props) {
             <div className="card card-primary">
               <div className="card-header">
 
-                <h3 className="card-title">{props.items[0].name}</h3>
+                <h3 className="card-title">Transação</h3>
               </div>
               <div className="card-body">
 
                 <div className="col-md-3">
                 </div>
-                <strong><i className="fas fa-book mr-1"></i> Descrição</strong>
+                <strong><i className="fas fa-pencil-alt mr-1"></i> Informação</strong>
                 <p class="text-muted">
-                  {props.items[0].description}
-                </p>
-                <strong><i className="fas fa-pencil-alt mr-1"></i> Informações</strong>
-                <p class="text-muted">
-                <b>Área : </b>{props.items[0].area} <br></br>
-                <b>Valor : </b>{props.items[0].creditAssigned} <br></br>
-                <b>Estado : </b>{props.items[0].state} <br></br>
-                <b>Atualização : </b>{props.items[0].updateDate}
-                </p>
-                <strong><i className="fas fa-file mr-1"></i> Documentação</strong>
-                <p class="text-muted">
-                <b>Arquivo : </b><a href={link} target="_blank">{props.items[0].documentation}</a><br></br>
-                <b>Hash : </b>{props.items[0].hash_documentation}
+                <b>Projeto ID : </b>{props.items[0].id} <br></br>
+                <b>Crédito : </b>{value} <br></br>
+                <b>hash : </b>{props.items[0].txhash} <br></br>
+                <b>Bloco : </b>{props.items[0].block}
                 </p>
                 <div className="modal-body">
                   <div><br></br></div>
@@ -80,4 +74,4 @@ function ModalViewProjeto(props) {
   );
 };
 
-export default ModalViewProjeto;
+export default ModalViewTransaction;

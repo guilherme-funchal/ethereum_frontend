@@ -6,6 +6,7 @@ import Api from '../../Api';
 import { Controller, useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
+import { useNavigate } from 'react-router-dom';
 
 function ModalAddProjeto (props) {
 
@@ -14,6 +15,8 @@ function ModalAddProjeto (props) {
       props.onClose();
     }
   };
+
+  const navigate = useNavigate();
 
   const [, setValues] = useState({
     id: 0,
@@ -65,7 +68,7 @@ function ModalAddProjeto (props) {
       description: "",
       documentation: "",
       hash_documentation: "",
-      state: "",
+      state: "rascunho",
       area: "",
       creditAssigned: "",
       creationDate: "",
@@ -82,10 +85,6 @@ function ModalAddProjeto (props) {
       .utcOffset('-03:00')
       .format('DD/MM/YYYY hh:mm:ss a');
     
-    // if (state == "on"){
-    //     state = "enviado";
-    // }
-    
     let formdata = new FormData(); 
     formdata.append('file', file);
 
@@ -95,7 +94,8 @@ function ModalAddProjeto (props) {
       }
     }
    
-    
+   
+
     var transactions_result = await Api.post("/upload", formdata, headers);
 
     block = {
@@ -112,8 +112,11 @@ function ModalAddProjeto (props) {
       "updateDate": String(current)
     };
 
+    console.log("block->", block);
+
     response = await Api.post('/projeto', block);
     props.onClose();
+    navigate(0);
   }
 
 
@@ -133,7 +136,7 @@ return ReactDOM.createPortal(
           <Form.Group as={Col} md="20" controlId="validationCustom01">
                 <Form.Label>Estado</Form.Label><br></br>
                 <select name="state" value={state} onChange={state => setState(state.target.value)}>
-                  <option value="0">Selecione um tipo</option>
+                  <option value="rascunho">Selecione um tipo</option>
                   <option value="rascunho">Rascunho</option>
                   <option value="enviado">Concluído</option>
                 </select><br /><br />

@@ -236,9 +236,10 @@ export default function Projetos() {
                                             // value = value.toLocaleString('pt-br', { minimumFractionDigits: 2 });
                                         }
                                     }
-                                    if (from === "0x0000000000000000000000000000000000000000") {
-                                        from = "Smart contract"
-                                    }
+
+                                    // if (from === "0x0000000000000000000000000000000000000000") {
+                                    //     from = "Smart contract"
+                                    // }
 
 
                                     if (user[0]?.profile === "certificador" || user[0]?.profile === "registrador" || user[0]?.user_id === to || user[0]?.user_id === from) {
@@ -259,7 +260,16 @@ export default function Projetos() {
 
                                                     <td onClick={() => viewUser(to)}><center>{to}</center></td>
                                                     <td><center>{value.toLocaleString('pt-br', { minimumFractionDigits: 2 })}</center></td>
-                                                    <td><center>{id}</center></td>
+                                                    <If condition={id === "Carbono"}>
+                                                    <Then>
+                                                    <td><center><i className="ion ion-leaf bg-success" style={{ fontSize: "20px" }}></i></center></td>
+                                                    </Then>
+                                                    </If>
+                                                    <If condition={id === "Moeda"}>
+                                                    <Then>
+                                                    <td><center><i className="ion ion-cash bg-info" style={{ fontSize: "20px" }}></i></center></td>
+                                                    </Then>
+                                                    </If>
                                                     <td><center><button className="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber); }}
                                                     ><i className="fa fa-clock fa-fw" style={{ fontSize: "15px" }}></i></button></center></td>
                                                 </tr>

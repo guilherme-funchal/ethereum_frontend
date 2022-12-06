@@ -323,7 +323,7 @@ export default function Transfer() {
                                                 <tr>
                                                     <td><center>{transferencia}</center></td>
                                                     <td><center>{obj.blockNumber}</center></td>
-                                                    <td onClick={() => viewUser(to)}><center>{from}</center></td>
+                                                    <td onClick={() => viewUser(from)}><center>{from}</center></td>
 
                                                     <td onClick={() => viewUser(to)}><center>{to}</center></td>
                                                     <td><center>{value.toLocaleString('pt-br', { minimumFractionDigits: 2 })}</center></td>

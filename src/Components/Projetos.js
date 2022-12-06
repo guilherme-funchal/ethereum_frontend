@@ -9,6 +9,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ModalAddProject from "./Modals/ModalAddProjeto";
 import ModalEditProject from "./Modals/ModalEditProject";
 import ModalViewProject from "./Modals/ModalViewProject";
+import ModalViewTransaction from "./Modals/ModalViewTransaction";
 import moment from 'moment';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
@@ -45,6 +46,7 @@ export default function Projetos(){
     const forceUpdate = useCallback(() => updateState({}), []);
     const [showModalAddProjeto, setShowModalAddProject] = useState(false);
     const [showModalViewProject, setShowModalViewProject] = useState(false);
+    const [showModalViewTransaction, setShowModalViewTransaction] = useState(false);
     const [showModalEditProject, setShowModalEditProject] = useState(false);
     const [modal, setModal] = useState(false);
 
@@ -71,6 +73,7 @@ export default function Projetos(){
     const navigate = useNavigate();
     const [projetos, setProjetos] = useState([]);
     const [items, setItems] = useState([' ']);
+    const [itemsTransactions, setItemsTransactions] = useState([' ']);
     const [itemsUser, setItemsUser] = useState([' ']);
     const [showModalViewUser, setShowModalViewUser] = useState(false);
     const [taxas, setTaxas] = useState([]);
@@ -86,10 +89,21 @@ export default function Projetos(){
         setItems(response.data);
     }
 
+    async function ViewItemsTransactions(id) {
+      var response = await Api.get('credito?id=' + id);
+      setItemsTransactions(response.data);
+    }
+
     async function viewProjeto(id) {
         EditItemsProject(id);
         setShowModalViewProject(true);
         forceUpdate();
+    }
+
+    async function ViewTransaction(id) {
+      ViewItemsTransactions(id);
+      setShowModalViewTransaction(true);
+      forceUpdate();
     }
     
     async function EditItemUser(user_id) {
@@ -196,7 +210,18 @@ export default function Projetos(){
             "amount": String(creditAssigned),
             "data": "0x"
           };
-          await Api.post('emitir', block_money);
+
+          var response_emitir = await Api.post('emitir', block_money);
+
+          var block_credito = {
+            "id": response.data[0].id,
+            "creditAssigned": String(creditAssigned),
+            "txhash": String(response_emitir.data.txhash),
+            "block": String(response_emitir.data.block)
+          };
+
+          response_emitir = await Api.post('credito', block_credito);
+
         }
         await Sucesso.fire({
           icon: 'success',
@@ -204,14 +229,14 @@ export default function Projetos(){
         });
       }
 
-      navigate(0);
+      // navigate(0);
     }
 
     async function finalizarProjeto(id, state) {
 
       Swal.fire({
-        title: 'Confirma operação?',
-        icon: 'warning',
+        title: 'Confirma aprovação do projeto?',
+        icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
@@ -253,8 +278,8 @@ export default function Projetos(){
                     <table className="blueTable">
               <thead>
                 <tr>
-                  <th><center>ID</center></th>
-                  <th><center>Nome</center></th>
+                  <th><center>Projeto ID</center></th>
+                  <th><center>Nome do projeto</center></th>
                   <th><center>Proprietário</center></th>
                   <th><center>Criador</center></th>
                   <th><center>Estado</center></th>
@@ -278,11 +303,19 @@ export default function Projetos(){
                     visible = true;
                   }
 
+                  if (data.state === 'rascunho' && user[0]?.user_id !== data.projectOwner) {
+                    visible = false;
+                  }
+
                   if (data.state === 'adquirido' || data.state === 'concluido' || data.state === 'enviado' && user[0]?.profile === "propositor") {
                     test = false;
                   }
 
                   if (data.state === 'aposentado' && user[0]?.profile === "propositor") {
+                    test = false;
+                  }
+
+                  if (data.state === 'aposentado' && user[0]?.profile === "registrador") {
                     test = false;
                   }
 
@@ -312,7 +345,7 @@ export default function Projetos(){
                       <If condition={visible === true}>
                         <Then>
                           <tr>
-                            <td onClick={() => viewProjeto(data.id)}><center>{data.id}</center></td>
+                            <td onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></td>
                             <td onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
                             <td onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
                             <td onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></td>
@@ -368,14 +401,12 @@ export default function Projetos(){
               Adicionar
             </Button>
 
-            <ModalAddProject setShowModalAddProject={setShowModalAddProject} toggle={toggle} keyboard={false} projectOwner={user[0]?.user_id} backdrop={"static"} title="Adicionar projeto" onClose={() => { setShowModalAddProject(false); getProjetos(); forceUpdate(); setItems(' ');}} show={showModalAddProjeto}>
-            </ModalAddProject>
-            <ModalViewProject title="Dados do Projeto" items={items} onClose={() => { setShowModalViewProject(false); }} show={showModalViewProject}>
-            </ModalViewProject>
-            <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => { getProjetos(); forceUpdate(); setShowModalEditProject(false); setItems(' '); }} show={showModalEditProject}>
-            </ModalEditProject>
-            <ModalViewUser title="Dados do Projeto" items={itemsUser} onClose={() => { setShowModalViewUser(false); }} show={showModalViewUser}>
-            </ModalViewUser>
+            <ModalAddProject setShowModalAddProject={setShowModalAddProject} toggle={toggle} keyboard={false} projectOwner={user[0]?.user_id} backdrop={"static"} title="Adicionar projeto" onClose={() => { setShowModalAddProject(false); getProjetos(); forceUpdate(); setItems(' ');}} show={showModalAddProjeto} />
+            <ModalViewProject title="Dados do Projeto" items={items} onClose={() => { setShowModalViewProject(false); }} show={showModalViewProject} />
+            <ModalViewTransaction title="Dados do Projeto" items={itemsTransactions} onClose={() => { setShowModalViewTransaction(false); }} show={showModalViewTransaction} />
+            <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => { getProjetos(); forceUpdate(); setShowModalEditProject(false); setItems(' '); }} show={showModalEditProject} />
+            <ModalViewUser title="Dados do Projeto" items={itemsUser} onClose={() => { setShowModalViewUser(false); }} show={showModalViewUser} />
+
                     </div>{/* /.container-fluid */}
                 </section>
                 {/* /.content */}

@@ -88,7 +88,7 @@ export default function Sidenav() {
       }
     
     var image = String(user[0]?.image);
-    console.log("user->", user);
+
     return (
         <div>
             <aside className="main-sidebar sidebar-dark-primary elevation-4 ">
@@ -98,11 +98,12 @@ export default function Sidenav() {
                 </Link>
                 <div className="sidebar">
                     <div className="user-panel mt-3 pb-3 mb-3 d-flex">
-                        <div className="image">
-                            <img src={image} className="img-circle elevation-2" alt="User Image" />
-                        </div>
-                         <If condition={user[0]?.name !== null}>
+
+                         <If condition={image !== "undefined"}>
                             <Then>
+                            <div className="image">
+                            <img src={image} className="img-circle elevation-2" alt="User Image" />
+                            </div>    
                             <div className="info">
                             <p className="text-white">
                                 {user[0]?.name}

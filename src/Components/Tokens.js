@@ -339,13 +339,13 @@ export default function Tokens() {
                                             // value = value.toLocaleString('pt-br', { minimumFractionDigits: 2 });
                                         }
                                     }
-                                    if (from === "0x0000000000000000000000000000000000000000") {
-                                        from = "Smart contract"
-                                    }
+                                    // if (from === "0x0000000000000000000000000000000000000000") {
+                                    //     from = "Smart contract"
+                                    // }
 
-                                    if (to === "0x0000000000000000000000000000000000000000") {
-                                        to = "Smart contract"
-                                    }
+                                    // if (to === "0x0000000000000000000000000000000000000000") {
+                                    //     to = "Smart contract"
+                                    // }
 
                                     return (
                                         <If condition={visible === true}>

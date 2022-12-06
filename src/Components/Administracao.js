@@ -10,7 +10,7 @@ import ModalAddUser from './Modals/ModalAddUser';
 import ModalEditUser from './Modals/ModalEditUser';
 import Modal1 from './Modals/Modal1';
 import './../App.css';
-
+import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
 
 export default function Administracao() {
     const column_tratamento = [
@@ -174,8 +174,15 @@ export default function Administracao() {
                             </thead>
 
                             {users.map((data) => {
+                                var visible = true;
                                 const style = { width: '60px' }
-                                return (<tr>
+                                if (data.user_id === "0x0000000000000000000000000000000000000000"){
+                                    visible = false;
+                                }
+                                return (
+                                    <If condition={visible === true}>
+                                    <Then>
+                                    <tr>
                                     <td><center>{data.user_id}</center></td>
                                     <td><center>{data.name}</center></td>
                                     <td><center>{data.email}</center></td>
@@ -190,7 +197,9 @@ export default function Administracao() {
                                         </Button>
                                     </div>
                                     </center></td>
-                                </tr>
+                                    </tr>
+                                    </Then>
+                                    </If> 
                                 );
                             })}
                             <tbody>

@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from "moment";
 import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
+import ModalViewTransaction from "./Modals/ModalViewTransaction";
 
 export default function Plataforma() {
   const Sucesso = Swal.mixin({
@@ -38,6 +39,7 @@ export default function Plataforma() {
   });
   const navigate = useNavigate();
   const [projetos, setProjetos] = useState([]);
+  const [itemsTransactions, setItemsTransactions] = useState([' ']);
 
   // const getUsuarios = async () => {
   //   const response = await Api.get('saldo-contas?wallet=1');
@@ -54,6 +56,18 @@ export default function Plataforma() {
     setProjetos(response.data);
   };
 
+  async function ViewItemsTransactions(id) {
+    var response = await Api.get('credito?id=' + id);
+    setItemsTransactions(response.data);
+  }
+
+
+  async function ViewTransaction(id) {
+    ViewItemsTransactions(id);
+    setShowModalViewTransaction(true);
+    forceUpdate();
+  }
+
   const style = { width: '90px' }
   const [taxas, setTaxas] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -66,6 +80,7 @@ export default function Plataforma() {
   const [itemsUser, setItemsUser] = useState([' ']);
   const [showModalViewProject, setShowModalViewProject] = useState(false);
   const [showModalViewUser, setShowModalViewUser] = useState(false);
+  const [showModalViewTransaction, setShowModalViewTransaction] = useState(false);
 
   const Toast = Swal.mixin({
     toast: true,
@@ -136,13 +151,9 @@ export default function Plataforma() {
 
     var test = await  updateProject(project_id, comprador);
 
-    console.log('---->', test);
-
     if (test === true) {
       test = await doTransfer(comprador, vendedor, 0, moeda);
     }
-
-    console.log('---->', test);
 
     if (test === true) {
       await doTransfer(vendedor, comprador, 1, credito);
@@ -191,6 +202,11 @@ export default function Plataforma() {
 
 
   async function exeAposentar(block1, block2){
+
+    console.log(block1);
+
+    console.log(block2);
+
     const response2 = await Api.post('queimar', block1);
     const response1 = await Api.patch('/projeto', block2);
 
@@ -202,11 +218,25 @@ export default function Plataforma() {
   }
 
   async function aposentarCredito(id, saldoCarbono) {
-    var result = await Api.get('projeto?id=' + id);
-
     var current = moment()
-      .utcOffset('-03:00')
-      .format('DD/MM/YYYY hh:mm:ss a');
+    .utcOffset('-03:00')
+    .format('DD/MM/YYYY hh:mm:ss a');
+    var result = await Api.get('projeto?id=' + id);
+    var block2 = {
+      "id": result.data[0]?.id,
+      "name": result.data[0]?.name,
+      "projectOwner": user[0]?.user_id,
+      "projectCreator": result.data[0]?.projectCreator,
+      "projectApprover": result.data[0]?.projectApprover,
+      "description": result.data[0]?.description,
+      "documentation": result.data[0]?.documentation,
+      "hash_documentation": result.data[0]?.hash_documentation,
+      "state": "aposentado",
+      "area": result.data[0]?.area,
+      "creditAssigned": result.data[0]?.creditAssigned,
+      "updateDate": String(current)
+    };
+
 
     (async () => {
       const { value: text } = await Swal.fire({
@@ -229,21 +259,6 @@ export default function Plataforma() {
             "account": String(user[0].user_id),
             "id": 1,
             "value": String(saldoCarbono)
-          };
-          
-          var block2 = {
-            "id": result.data[0]?.id,
-            "name": result.data[0]?.name,
-            "projectOwner": user[0]?.user_id,
-            "projectCreator": result.data[0]?.projectCreator,
-            "projectApprover": result.data[0]?.projectApprover,
-            "description": result.data[0]?.description,
-            "documentation": result.data[0]?.documentation,
-            "hash_documentation": result.data[0]?.hash_documentation,
-            "state": "aposentado",
-            "area": result.data[0]?.area,
-            "creditAssigned": result.data[0]?.creditAssigned,
-            "updateDate": String(current)
           };
 
           exeAposentar(block1, block2);
@@ -333,9 +348,9 @@ export default function Plataforma() {
                   <div className="icon">
                     <i className="ion ion-leaf" />
                   </div>
-                  <a href="#" className="small-box-footer" onClick="">
+                  {/* <a href="#" className="small-box-footer" onClick="">
                     Aposentar crédito carbono <i className="fas fa-arrow-circle-right"></i>
-                  </a>
+                  </a> */}
                 </div>
               </div>
               <div className="col-lg-3 col-6">
@@ -348,9 +363,9 @@ export default function Plataforma() {
                   <div className="icon">
                     <i className="ion ion-cash" />
                   </div>
-                  <a href="/" className="small-box-footer">
+                  {/* <a href="/" className="small-box-footer">
                     Ver transações <i className="fas fa-arrow-circle-right"></i>
-                  </a>
+                  </a> */}
                 </div>
               </div>
             </div>
@@ -358,7 +373,7 @@ export default function Plataforma() {
               <thead>
                 <tr>
                   <th><center>Projeto ID</center></th>
-                  <th><center>Nome</center></th>
+                  <th><center>Nome do projeto</center></th>
                   <th><center>Proprietário</center></th>
                   <th><center>Criador</center></th>
                   <th><center>Estado</center></th>
@@ -376,7 +391,7 @@ export default function Plataforma() {
                 var adquirir = true;
                 var aposentar = false;
                 
-                if (data.projectOwner === "0x0000000000000000000000000000000000000000" || data.state === "enviado"){
+                if (data.projectOwner === "0x0000000000000000000000000000000000000000" || data.state === "enviado" || data.state === "rascunho" ){
                   visible = false;
                 }
 
@@ -392,7 +407,7 @@ export default function Plataforma() {
                     <>
                     <If condition={visible === true}>
                       <Then>
-                      <td onClick={() => viewProjeto(data.id)}><center>{data.id}</center></td>
+                      <td onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></td>
                       <td onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
                       <td onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
                       <td onClick={() => viewUser(data.projectCreator)}><center>{data.projectOwner}</center></td>
@@ -425,10 +440,10 @@ export default function Plataforma() {
         {/* /.content */}
       </div>
       {/* /.content-wrapper */}
-      <ModalViewProject title="Dados do Projeto" items={items} onClose={() => { setShowModalViewProject(false); }} show={showModalViewProject}>
-      </ModalViewProject>
-      <ModalViewUser title="Dados do Projeto" items={itemsUser} onClose={() => { setShowModalViewUser(false); }} show={showModalViewUser}>
-      </ModalViewUser>
+      <ModalViewProject title="Dados do Projeto" items={items} onClose={() => { setShowModalViewProject(false); }} show={showModalViewProject} />
+      <ModalViewUser title="Dados do Projeto" items={itemsUser} onClose={() => { setShowModalViewUser(false); }} show={showModalViewUser} />
+      <ModalViewTransaction title="Dados do Projeto" items={itemsTransactions} onClose={() => { setShowModalViewTransaction(false); }} show={showModalViewTransaction} />
+
       <Footer />
     </div>
   )
