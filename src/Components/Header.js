@@ -34,13 +34,10 @@ export default function Header() {
 
     if (wallet) {
       var response = await Api.get('account/find/' + wallet);
-      console.log(response.data.length);
 
       if (response.data.length === 0) {
-        console.log("Não localizado o usuário!!!");
         Swal.fire('Usuário não localizado!', '', 'error');
       } else {
-        console.log(response.data);
         localStorage.setItem('wallet', JSON.stringify(response.data));
         navigate("/Dashboard");
         navigate(0);

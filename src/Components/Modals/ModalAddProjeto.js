@@ -112,8 +112,6 @@ function ModalAddProjeto (props) {
       "updateDate": String(current)
     };
 
-    console.log("block->", block);
-
     response = await Api.post('/projeto', block);
     props.onClose();
     navigate(0);

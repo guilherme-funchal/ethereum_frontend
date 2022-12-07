@@ -19,8 +19,13 @@ export default function Transfer() {
     }
     
     async function viewUser(user_id) {
-        EditItemUser(user_id);
-        setShowModalViewUser(true);
+        var response = await Api.get('account/find/' + user_id);
+        Swal.fire({
+            title: response.data[0].name,
+            text: response.data[0].email,
+            imageUrl: response.data[0].image,
+            imageAlt: 'Custom image',
+        })
     }
 
     const [itemsUser, setItemsUser] = useState([' ']);
@@ -318,14 +323,14 @@ export default function Transfer() {
                                     }
 
                                     return (
-                                        <If condition={visible === true}>
+                                        <If key={Math.random()} condition={visible === true}>
                                             <Then>
                                                 <tr>
                                                     <td><center>{transferencia}</center></td>
                                                     <td><center>{obj.blockNumber}</center></td>
-                                                    <td onClick={() => viewUser(from)}><center>{from}</center></td>
+                                                    <td><a href="#" onClick={() => viewUser(from)}><center>{from}</center></a></td>
 
-                                                    <td onClick={() => viewUser(to)}><center>{to}</center></td>
+                                                    <td><a href="#" onClick={() => viewUser(to)}><center>{to}</center></a></td>
                                                     <td><center>{value.toLocaleString('pt-br', { minimumFractionDigits: 2 })}</center></td>
                                                     <td><center>{id}</center></td>
                                                     <td><center><button className="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber); }}

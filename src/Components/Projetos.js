@@ -2,20 +2,17 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidenav from './Sidenav';
 import Api from '../Api';
-import Table from './Tables/Table';
 import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
 import Button from 'react-bootstrap/Button';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ModalAddProject from "./Modals/ModalAddProjeto";
 import ModalEditProject from "./Modals/ModalEditProject";
-import ModalViewProject from "./Modals/ModalViewProject";
-import ModalViewTransaction from "./Modals/ModalViewTransaction";
 import moment from 'moment';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import ModalViewUser from "./Modals/ModalViewUser";
+import withReactContent from 'sweetalert2-react-content';
 
-export default function Projetos(){ 
+export default function Projetos() {
   const Sucesso = Swal.mixin({
     toast: true,
     // position: 'center',
@@ -40,242 +37,293 @@ export default function Projetos(){
     timerProgressBar: true
   });
 
-    const [AprovItems, setAprovItems] = useState([' ']);
-    const [user, setUser] = useState([]);
-    const [, updateState] = useState();
-    const forceUpdate = useCallback(() => updateState({}), []);
-    const [showModalAddProjeto, setShowModalAddProject] = useState(false);
-    const [showModalViewProject, setShowModalViewProject] = useState(false);
-    const [showModalViewTransaction, setShowModalViewTransaction] = useState(false);
-    const [showModalEditProject, setShowModalEditProject] = useState(false);
-    const [modal, setModal] = useState(false);
+  const [AprovItems, setAprovItems] = useState([' ']);
+  const [user, setUser] = useState([]);
+  const [, updateState] = useState();
+  const forceUpdate = useCallback(() => updateState({}), []);
+  const [showModalAddProjeto, setShowModalAddProject] = useState(false);
+  const [showModalViewProject, setShowModalViewProject] = useState(false);
+  const [showModalViewTransaction, setShowModalViewTransaction] = useState(false);
+  const [showModalEditProject, setShowModalEditProject] = useState(false);
+  const [modal, setModal] = useState(false);
 
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'bottom-right',
-        iconColor: 'green',
-        customClass: {
-          popup: 'colored-toast'
-        },
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true
-      });
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'bottom-right',
+    iconColor: 'green',
+    customClass: {
+      popup: 'colored-toast'
+    },
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true
+  });
 
-    const getProjetos = async (cod_paciente) => {
-        const response = await Api.get('listarProjetos');
-        setProjetos(response.data);
-    };
+  const getProjetos = async (cod_paciente) => {
+    const response = await Api.get('listarProjetos');
+    setProjetos(response.data);
+  };
 
-    const toggle = () => {
-        setModal(!modal);
-    };
-    const navigate = useNavigate();
-    const [projetos, setProjetos] = useState([]);
-    const [items, setItems] = useState([' ']);
-    const [itemsTransactions, setItemsTransactions] = useState([' ']);
-    const [itemsUser, setItemsUser] = useState([' ']);
-    const [showModalViewUser, setShowModalViewUser] = useState(false);
-    const [taxas, setTaxas] = useState([]);
+  const toggle = () => {
+    setModal(!modal);
+  };
+  const navigate = useNavigate();
+  const [projetos, setProjetos] = useState([]);
+  const [items, setItems] = useState([' ']);
+  const [itemsTransactions, setItemsTransactions] = useState([' ']);
+  const [itemsUser, setItemsUser] = useState([' ']);
+  const [showModalViewUser, setShowModalViewUser] = useState(false);
+  const [taxas, setTaxas] = useState([]);
+  const MySwal = withReactContent(Swal);
 
-    const getTaxas = async () => {
-        const response = await Api.get('tax/list');
-        setTaxas(response.data);
-    };
+  const getTaxas = async () => {
+    const response = await Api.get('tax/list');
+    setTaxas(response.data);
+  };
 
 
-    async function EditItemsProject(id) {
-        var response = await Api.get('projeto?id=' + id);
-        setItems(response.data);
-    }
-
-    async function ViewItemsTransactions(id) {
-      var response = await Api.get('credito?id=' + id);
-      setItemsTransactions(response.data);
-    }
-
-    async function viewProjeto(id) {
-        EditItemsProject(id);
-        setShowModalViewProject(true);
-        forceUpdate();
-    }
-
-    async function ViewTransaction(id) {
-      ViewItemsTransactions(id);
-      setShowModalViewTransaction(true);
-      forceUpdate();
-    }
-    
-    async function EditItemUser(user_id) {
-      var response = await Api.get('account/find/' + user_id);
-      setItemsUser(response.data);
-    }
-  
-  async function viewUser(user_id) {
-      EditItemUser(user_id);
-      setShowModalViewUser(true);
+  async function EditItemsProject(id) {
+    var response = await Api.get('projeto?id=' + id);
+    setItems(response.data);
   }
-    async function editProjeto(id) {
-        EditItemsProject(id);
-        setShowModalEditProject(true);
-    }
 
-    async function delProjeto(id) {
-        Swal.fire({
-          title: 'Deseja excluir o projeto?',
-          text: "",
-          icon: 'question',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Sim',
-          cancelButtonText: 'Não'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            var response = Api.delete('projeto/' + id);
-    
-            Toast.fire({
-              icon: 'success',
-              title: 'Projeto excluído'
-            });
-            navigate(0);
-          }
-          
-        })
+  async function ViewItemsTransactions(id) {
+    var response = await Api.get('credito?id=' + id);
+    setItemsTransactions(response.data);
+  }
+
+  async function viewProjeto(id) {
+    var response = await Api.get('projeto?id=' + id);
+    const link = "http://localhost:3001/upload/" + items[0].documentation;
+
+
+    var html =
+      '<p style="text-align:left;"><b>Nome : </b><span>' + response.data[0].name + '</span></p>' +
+      '<p style="text-align:left;"><b>Descição : </b><span>' + response.data[0].description + '</span></p>' +
+      '<p style="text-align:left;"><b>Área  : </b><span>' + response.data[0].area + '</span></p>' +
+      '<p style="text-align:left;"><b>Estado  : </b><span>' + response.data[0].state + '</span></p>' +
+      '<p style="text-align:left;"><b>Atualização  : </b><span>' + response.data[0].updateDate + '</span></p>' +
+      '<p style="text-align:left;"><b>Arquivo  : </b><a href=' + link + '>' + response.data[0].documentation + '</a></p>' +
+      '<p style="text-align:left;"><b>Hash do arquivo : </b><span>' + response.data[0].hash_documentation + '</span></p>'
+
+    MySwal.fire({
+      width: 600,
+      html: html,
+      icon: 'info'
+    });
+
+  }
+
+  async function ViewTransaction(id) {
+    ViewItemsTransactions(id);
+    var value = parseFloat(itemsTransactions[0].creditAssigned);
+    value = value.toLocaleString('pt-br', { minimumFractionDigits: 2 });
+
+    var html =
+      '<p style="text-align:left;"><b>Projeto ID : </b><span>' + itemsTransactions[0].id + '</span></p>' +
+      '<p style="text-align:left;"><b>Crédito : </b><span>' + value + '</span></p>' +
+      '<p style="text-align:left;"><b>TX Hash : </b><span>' + itemsTransactions[0].txhash + '</span></p>' +
+      '<p style="text-align:left;"><b>Bloco  : </b><span>' + itemsTransactions[0].block + '</span></p>'
+
+    MySwal.fire({
+      width: 600,
+      html: html,
+      icon: 'info'
+    });
+  }
+
+  async function viewUser(user_id) {
+    var response = await Api.get('account/find/' + user_id);
+      Swal.fire({
+        title: response.data[0].name,
+        text: response.data[0].email,
+        imageUrl: response.data[0].image,
+        imageAlt: 'Custom image',
+      })
+  }
+
+  async function editProjeto(id) {
+    EditItemsProject(id);
+    setShowModalEditProject(true);
+  }
+
+  async function delProjeto(id) {
+    Swal.fire({
+      title: 'Deseja excluir o projeto?',
+      text: "",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var response = Api.delete('projeto/' + id);
+
+        Toast.fire({
+          icon: 'success',
+          title: 'Projeto excluído'
+        });
+        navigate(0);
       }
 
-    async function transferCredit(account, creditAssigned) {
+    })
+  }
 
+  async function ViewTransaction(id) {
+    var response = await Api.get('credito?id=' + id);
+
+
+    var value = parseFloat(response.data[0].creditAssigned);
+    value = value.toLocaleString('pt-br', { minimumFractionDigits: 2 });
+
+    var html =
+          '<p style="text-align:left;"><b>Projeto ID : </b><span>' + response.data[0].id + '</span></p>' +
+          '<p style="text-align:left;"><b>Crédito : </b><span>' + value + '</span></p>' +
+          '<p style="text-align:left;"><b>TX Hash  : </b><span>' + response.data[0].txhash + '</span></p>' +
+          '<p style="text-align:left;"><b>Bloco  : </b><span>' + response.data[0].block + '</span></p>'
+    
+        MySwal.fire({
+          width: 600,
+          html: html,
+          icon: 'info'
+        });
+
+  }
+
+  async function transferCredit(account, creditAssigned) {
+
+    var block_money = {
+      "account": AprovItems[0].projectOwner,
+      "id": "1",
+      "amount": creditAssigned,
+      "data": "0x"
+    };
+    await Api.post('emitir', block_money);
+  }
+
+  useEffect(() => {
+    var address = localStorage.getItem('wallet');
+    if (address !== null) {
+      setUser(JSON.parse(address));
+      getProjetos();
+      getTaxas();
+    } else {
+      setUser(false);
+    }
+
+  }, []);
+
+  async function updadateProject(id, state) {
+    if (state === true) {
+      var state = "concluido";
+    }
+    if (state === false) {
+      var state = "rejeitado";
+    }
+
+    var response = await Api.get('projeto?id=' + id);
+    setAprovItems(response.data);
+
+    var current = moment()
+      .utcOffset('-03:00')
+      .format('DD/MM/YYYY hh:mm:ss a');
+
+    let creditAssigned = 0;
+    creditAssigned = response.data[0].area * taxas.carbono;
+
+    const block = {
+      "id": response.data[0].id,
+      "name": response.data[0].name,
+      "projectOwner": response.data[0].projectOwner,
+      "projectCreator": response.data[0].projectCreator,
+      "projectApprover": response.data[0].projectApprover,
+      "description": response.data[0].description,
+      "documentation": response.data[0].documentation,
+      "hash_documentation": response.data[0].hash_documentation,
+      "state": state,
+      "area": response.data[0].area,
+      "creditAssigned": String(creditAssigned),
+      "updateDate": String(current)
+    };
+
+    var response_patch = await Api.patch('/projeto', block);
+
+    if (response_patch.status === 200) {
+      if (state === "concluido") {
         var block_money = {
-          "account": AprovItems[0].projectOwner,
+          "account": response.data[0].projectOwner,
           "id": "1",
-          "amount": creditAssigned,
+          "amount": String(creditAssigned),
           "data": "0x"
         };
-        await Api.post('emitir', block_money);
+
+        var response_emitir = await Api.post('emitir', block_money);
+
+        var block_credito = {
+          "id": response.data[0].id,
+          "creditAssigned": String(creditAssigned),
+          "txhash": String(response_emitir.data.txhash),
+          "block": String(response_emitir.data.block)
+        };
+
+        response_emitir = await Api.post('credito', block_credito);
+
+      }
+      await Sucesso.fire({
+        icon: 'success',
+        title: 'Projeto sendo atualizado'
+      });
     }
 
-    useEffect(() => {
-        var address = localStorage.getItem('wallet');
-        if (address !== null) {
-          setUser(JSON.parse(address));
-          getProjetos();
-          getTaxas();
-      } else {
-          setUser(false);
+    navigate(0);
+  }
+
+  async function finalizarProjeto(id, state) {
+
+    Swal.fire({
+      title: 'Confirma aprovação do projeto?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        updadateProject(id, state);
       }
+    })
+    // await getProjetos();
+    // await forceUpdate();
+    // if (state === "concluido") {
+    //   Swal.fire('Projeto aprovado, crédito carbono gerado!', '', 'success');
+    // }
+    // if (state === "rejeitado") {
+    //   Swal.fire('Projeto foi rejeitado!', '', 'error');
+    // }
+  }
 
-    }, []);
-
-    async function updadateProject(id, state){
-      if (state === true) {
-        var state = "concluido";
-      }
-      if (state === false) {
-        var state = "rejeitado";
-      }
-  
-      var response = await Api.get('projeto?id=' + id);
-      setAprovItems(response.data);
-  
-      var current = moment()
-        .utcOffset('-03:00')
-        .format('DD/MM/YYYY hh:mm:ss a');
-  
-      let creditAssigned = 0;
-      creditAssigned = response.data[0].area * taxas.carbono;
-  
-      const block = {
-        "id": response.data[0].id,
-        "name": response.data[0].name,
-        "projectOwner": response.data[0].projectOwner,
-        "projectCreator": response.data[0].projectCreator,
-        "projectApprover": response.data[0].projectApprover,
-        "description": response.data[0].description,
-        "documentation": response.data[0].documentation,
-        "hash_documentation": response.data[0].hash_documentation,
-        "state": state,
-        "area": response.data[0].area,
-        "creditAssigned": String(creditAssigned),
-        "updateDate": String(current)
-      };
-  
-      var response_patch = await Api.patch('/projeto', block);
-  
-      if (response_patch.status === 200) {
-        if (state === "concluido") {
-          var block_money = {
-            "account": response.data[0].projectOwner,
-            "id": "1",
-            "amount": String(creditAssigned),
-            "data": "0x"
-          };
-
-          var response_emitir = await Api.post('emitir', block_money);
-
-          var block_credito = {
-            "id": response.data[0].id,
-            "creditAssigned": String(creditAssigned),
-            "txhash": String(response_emitir.data.txhash),
-            "block": String(response_emitir.data.block)
-          };
-
-          response_emitir = await Api.post('credito', block_credito);
-
-        }
-        await Sucesso.fire({
-          icon: 'success',
-          title: 'Projeto sendo atualizado'
-        });
-      }
-
-      // navigate(0);
-    }
-
-    async function finalizarProjeto(id, state) {
-
-      Swal.fire({
-        title: 'Confirma aprovação do projeto?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sim',
-        cancelButtonText: 'Não'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          updadateProject(id, state)
-        }
-      })
-        // await getProjetos();
-        // await forceUpdate();
-        // if (state === "concluido") {
-        //   Swal.fire('Projeto aprovado, crédito carbono gerado!', '', 'success');
-        // }
-        // if (state === "rejeitado") {
-        //   Swal.fire('Projeto foi rejeitado!', '', 'error');
-        // }
-      }
-
-    return (
-        <div>
-            <Header />
-            <Sidenav /> 
-            {/* Content Wrapper. Contains page content */}
-            <div className="content-wrapper">
-                {/* Content Header (Page header) */}
-                <div className="content-header">
-                    <div className="container-fluid">
-                        <div className="row mb-2">
-                            <div className="col-sm-6">
-                                <h1 className="m-0">Projetos</h1>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <section className="content">
-                    <div className="container-fluid">
-                    <table className="blueTable">
+  return (
+    <div>
+      <Header />
+      <Sidenav />
+      {/* Content Wrapper. Contains page content */}
+      <div className="content-wrapper">
+        {/* Content Header (Page header) */}
+        <div className="content-header">
+          <div className="container-fluid">
+            <div className="row mb-2">
+              <div className="col-sm-6">
+                <h1 className="m-0">Projetos</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+        <section className="content">
+          <div className="container-fluid">
+            <table className="blueTable">
               <thead>
                 <tr>
                   <th><center>Projeto ID</center></th>
@@ -291,6 +339,7 @@ export default function Projetos(){
                   <th><center>Operações</center></th>
                 </tr>
               </thead>
+              <tbody>
               {
                 projetos.map((data) => {
                   var test = true;
@@ -340,41 +389,38 @@ export default function Projetos(){
 
                   if (data.id !== '0') {
                     return (
-                      
 
-                      <If condition={visible === true}>
-                        <Then>
-                          <tr>
-                            <td onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></td>
-                            <td onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
-                            <td onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
-                            <td onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></td>
-                            <td onClick={() => viewProjeto(data.id)}><center>{data.state}</center></td>
-                            {/* <td onClick={() => viewProjeto(data.id)}><center>{data.area}</center></td>
-                            <td onClick={() => viewProjeto(data.id)}><center>{data.creditAssigned}</center></td> */}
-                            {/* <td onClick={() => viewProjeto(data.id)}><center>{data.creationDate}</center></td> */}
-                            {/* <td onClick={() => viewProjeto(data.id)}><center>{aposentado}</center></td> */}
-                            <td onClick={() => viewProjeto(data.id)}><center>{data.updateDate}</center></td>
 
-                            <If condition={test === true}>
-                              <Then>
-                                <td><center><div>
-                                  <If condition={visible === true}>
-                                    <Then>
-                                      <If condition={propositor === true}>
-                                        <Then>
+                      <If key={Math.random()} condition={visible === true}>
+                        <Then key={Math.random()}>
+
+                          <tr key={Math.random()}>
+                            <td key={data.id}><a href="#" onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></a></td>
+                            <td key={data.name}><a href="#" onClick={() => viewProjeto(data.id)}><center>{data.name}</center></a></td>
+                            <td key={data.projectOwner}><a href="#" onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></a></td>
+                            <td key={data.projectCreator}><a href="#" onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></a></td>
+                            <td key={data.state}><center>{data.state}</center></td>
+                            <td key={data.updateDate}><center>{data.updateDate}</center></td>
+
+                            <If key={Math.random()} condition={test === true}>
+                              <Then key={Math.random()}>
+                                <td key={Math.random()}><center><div>
+                                  <If key={Math.random()} condition={visible === true}>
+                                    <Then key={Math.random()}>
+                                      <If key={Math.random()} condition={propositor === true}>
+                                        <Then key={Math.random()}>
                                           <Button style={style} className="btn btn-default" rounded variant="primary" size="sm" name="teste" onClick={() => editProjeto(data.id)}>Editar</Button>
                                           <Button style={style} className="btn btn-default" rounded variant="danger" size="sm" onClick={() => delProjeto(data.id)}>Excluir</Button>
                                         </Then>
                                       </If>
-                                      <If condition={certificador === true}>
-                                        <Then>
+                                      <If key={Math.random()} condition={certificador === true}>
+                                        <Then key={Math.random()}>
                                           <Button style={style} className="btn btn-default" rounded variant="success" size="sm" onClick={() => finalizarProjeto(data.id, true)}>Aprovar</Button>
                                           <Button style={style} className="btn btn-default" rounded variant="danger" size="sm" onClick={() => finalizarProjeto(data.id, false)}>Rejeitar</Button>
                                         </Then>
                                       </If>
-                                      <If condition={registrador === true}>
-                                        <Then>
+                                      <If key={Math.random()} condition={registrador === true}>
+                                        <Then key={Math.random()}>
                                           {/* <Button style={style} className="btn btn-default" rounded variant="primary" size="sm" name="teste" onClick={() => editProjeto(data.id)}>Editar</Button>
                                           <Button style={style} className="btn btn-default" rounded variant="danger" size="sm" onClick={() => delProjeto(data.id)}>Excluir</Button> */}
                                           <Button style={style} className="btn btn-default" rounded variant="success" size="sm" onClick={() => finalizarProjeto(data.id, true)}>Aprovar</Button>
@@ -394,25 +440,21 @@ export default function Projetos(){
                     );
                   }
                 })}
-              {/* <tbody>
-              </tbody> */}
+
+            </tbody>
             </table>
             <Button variant="primary" size="sm" onClick={() => setShowModalAddProject(true)}>
               Adicionar
             </Button>
 
-            <ModalAddProject setShowModalAddProject={setShowModalAddProject} toggle={toggle} keyboard={false} projectOwner={user[0]?.user_id} backdrop={"static"} title="Adicionar projeto" onClose={() => { setShowModalAddProject(false); getProjetos(); forceUpdate(); setItems(' ');}} show={showModalAddProjeto} />
-            <ModalViewProject title="Dados do Projeto" items={items} onClose={() => { setShowModalViewProject(false); }} show={showModalViewProject} />
-            <ModalViewTransaction title="Dados do Projeto" items={itemsTransactions} onClose={() => { setShowModalViewTransaction(false); }} show={showModalViewTransaction} />
+            <ModalAddProject setShowModalAddProject={setShowModalAddProject} toggle={toggle} keyboard={false} projectOwner={user[0]?.user_id} backdrop={"static"} title="Adicionar projeto" onClose={() => { setShowModalAddProject(false); getProjetos(); forceUpdate(); setItems(' '); }} show={showModalAddProjeto} />
             <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => { getProjetos(); forceUpdate(); setShowModalEditProject(false); setItems(' '); }} show={showModalEditProject} />
-            <ModalViewUser title="Dados do Projeto" items={itemsUser} onClose={() => { setShowModalViewUser(false); }} show={showModalViewUser} />
-
-                    </div>{/* /.container-fluid */}
-                </section>
-                {/* /.content */}
-            </div>
-            {/* /.content-wrapper */}
-            <Footer />
+          </div>
+        </section>
+       
+      </div>
+ 
+      <Footer key="footer"/>
     </div>
-    )
+  )
 }

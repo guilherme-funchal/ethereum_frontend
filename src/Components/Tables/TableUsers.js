@@ -17,10 +17,9 @@ const Toast = Swal.mixin({
 });
 
 const Table = ({ data, column, showModal1 }) => {
-  console.log('showModal1->', showModal1)
+
   function passValue(val){
-    console.log('val->', val);
-    return showModal1(true);
+        return showModal1(true);
   }
   return (
     <table className="blueTable">

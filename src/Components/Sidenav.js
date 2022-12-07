@@ -69,21 +69,22 @@ export default function Sidenav() {
     async function WalletAtual() {   
 
         var html =
-          '<p className="text-left small"><b>Wallet : </b><span>' + user[0]?.user_id + '</span></p>' +
-          '<p className="text-left small"><b>Nome : </b><span>' + user[0]?.name + '</span></p>' +
-          '<p className="text-left small"><b>Perfil : </b><span>' + user[0]?.profile + '</span></p>' +
-          '<p className="text-left small"><b>Descrição : </b><span>' + user[0]?.desc + '</span></p>' +
-          '<p className="text-left small"><b>Email: </b><span>' + user[0]?.email + '</span></p>'
-    
-        if (user.type === 'pj') {
-          html = html + '<p className="text-left small"><b>CNPJ: </b><span>' + user[0]?.doc + '</span></p>'
+          '<p style="text-align:left;"><b>Wallet : </b><span>' + user[0]?.user_id + '</span></p>' +
+          '<p style="text-align:left;"><b>Nome : </b><span>' + user[0]?.name + '</span></p>' +
+          '<p style="text-align:left;"><b>Perfil : </b><span>' + user[0]?.profile + '</span></p>' +
+          '<p style="text-align:left;"><b>Descrição : </b><span>' + user[0]?.desc + '</span></p>' +
+          '<p style="text-align:left;"><b>Email: </b><span>' + user[0]?.email + '</span></p>'
+
+        if (user[0]?.type === 'pj') {
+          html = html + '<p style="text-align:left;"><b>CNPJ: </b><span>' + user[0]?.doc + '</span></p>'
         } else {
-          html = html + '<p className="text-left small"><b>CPF: </b><span>' + user[0]?.doc + '</span></p>'
+          html = html + '<p style="text-align:left;"><b>CPF: </b><span>' + user[0]?.doc + '</span></p>'
         }
     
         MySwal.fire({
+          width: 450,  
           html: html,
-          icon: 'info'
+          imageUrl: user[0]?.image
         });
       }
     
@@ -102,12 +103,12 @@ export default function Sidenav() {
                          <If condition={image !== "undefined"}>
                             <Then>
                             <div className="image">
-                            <img src={image} className="img-circle elevation-2" alt="User Image" />
+                            <a href="#"><img src={image} onClick={WalletAtual} className="img-circle elevation-2" alt="User Image" /></a>
                             </div>    
                             <div className="info">
                             <p className="text-white">
                                 {user[0]?.name}
-                                <button id="btn1" className="btn text-light" onClick={WalletAtual}><i className="fas fa fa-info" /> </button>
+                                {/* <button id="btn1" className="btn text-light" onClick={WalletAtual}><i className="fas fa fa-info" /> </button> */}
                             </p> 
                             </div>
                             </Then>  

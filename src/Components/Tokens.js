@@ -4,12 +4,11 @@ import Sidenav from './Sidenav';
 import Api from '../Api';
 import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
-import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
+import { If, Then } from 'react-if-elseif-else-render';
 import Web3 from 'web3';
 import { useState, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
-import ModalViewUser from "./Modals/ModalViewUser";
 
 export default function Tokens() {
 
@@ -55,7 +54,7 @@ export default function Tokens() {
     const [, updateState] = useState();
 
     const [taxas, setTaxas] = useState([]);
-    const [itemsUser, setItemsUser] = useState([' ']);
+    const [itemsUser, setItemsUser] = useState([""]);
     const [showModalViewUser, setShowModalViewUser] = useState(false);
 
     const getTaxas = async () => {
@@ -68,13 +67,21 @@ export default function Tokens() {
         var response = await Api.get('account/find/' + user_id);
         setItemsUser(response.data);
     }
+
+    useEffect(() => {
+
+    }, [])
     
     async function viewUser(user_id) {
-        if (user_id !== "Smart contract"){
-            EditItemUser(user_id);
-            setShowModalViewUser(true);
-        }
-        
+        var response = await Api.get('account/find/' + user_id);
+
+            Swal.fire({
+                title: response.data[0].name,
+                text: response.data[0].email,
+                imageUrl: response.data[0].image,
+                imageAlt: 'Custom image',
+            })
+
     }
 
     async function burnTokem() {
@@ -348,17 +355,17 @@ export default function Tokens() {
                                     // }
 
                                     return (
-                                        <If condition={visible === true}>
+                                        <If key={Math.random()} condition={visible === true}>
                                             <Then>
                                                 <tr>
-                                                    <td><center>{transferencia}</center></td>
-                                                    <td><center>{obj.blockNumber}</center></td>
-                                                    <td onClick={() => viewUser(from)}><center>{from}</center></td>
+                                                    <td key={transferencia} ><center>{transferencia}</center></td>
+                                                    <td key={obj.blockNumber}><center>{obj.blockNumber}</center></td>
+                                                    <td key={from}><a href="#" onClick={() => viewUser(from)}><center>{from}</center></a></td>
 
-                                                    <td onClick={() => viewUser(to)}><center>{to}</center></td>
-                                                    <td><center>{value.toLocaleString('pt-br', { minimumFractionDigits: 2 })}</center></td>
-                                                    <td><center>{id}</center></td>
-                                                    <td><center><button className="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber); }}
+                                                    <td key={to}><a href="#" onClick={() => viewUser(to)}><center>{to}</center></a></td>
+                                                    <td key={value}><center>{value.toLocaleString('pt-br', { minimumFractionDigits: 2 })}</center></td>
+                                                    <td key={id}><center>{id}</center></td>
+                                                    <td key="button"><center><button className="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber); }}
                                                     ><i className="fa fa-clock fa-fw" style={{ fontSize: "15px" }}></i></button></center></td>
                                                 </tr>
                                             </Then>
@@ -373,8 +380,6 @@ export default function Tokens() {
                 {/* /.content */}
             </div>
             {/* /.content-wrapper */}
-            <ModalViewUser title="Dados do Projeto" items={itemsUser} onClose={() => { setShowModalViewUser(false); }} show={showModalViewUser}>
-            </ModalViewUser>
             <Footer />
         </div>
     )

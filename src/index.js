@@ -1,10 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from "react-dom/client";
 import './index.css';
 import App from './App';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import Ajuda from './Components/Plataforma';
-import Configuracao from './Components/Administracao';
+import Plataforma from './Components/Plataforma';
+import Administracao from './Components/Administracao';
 import Projetos from './Components/Projetos';
 import Tokens from './Components/Tokens';
 import Transfer from './Components/Transfer';
@@ -15,16 +15,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <Router forceRefresh={true}>
-        <Routes>
-          <Route path="/" element={<App />} exact/>
-          <Route path="/Plataforma" element={<Ajuda />} exact/>
-          <Route path="/Tokens" element={<Tokens />} exact/>
-          <Route path="/Transfer" element={<Transfer />} exact/>
-          <Route path="/Administracao" element={<Configuracao />} exact/>
-          <Route path="/Dashboard" element={<Dashboard />} exact/>
-          <Route path="/Projetos" element={<Projetos />} exact/>
-          <Route path="/logoff" element={<Logoff />} exact/>
+    <Router key="router">
+        <Routes key="routes">
+          <Route key="/" path="/" element={<App />} />
+          <Route key="Plataforma" path="/Plataforma" element={<Plataforma />}  />
+          <Route key="Tokens" path="/Tokens" element={<Tokens />}  />
+          <Route key="Transfer" path="/Transfer" element={<Transfer />}  />
+          <Route key="Administracao" path="/Administracao" element={<Administracao />} />
+          <Route key="Dashboard" path="/Dashboard" element={<Dashboard />} />
+          <Route key="Projetos" path="/Projetos" element={<Projetos />}  />
+          <Route key="logoff" path="/logoff" element={<Logoff />}  />
         </Routes>
     </Router>
     

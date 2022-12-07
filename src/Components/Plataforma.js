@@ -5,13 +5,10 @@ import Api from '../Api';
 import { Button } from 'react-bootstrap/';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import ModalViewProject from "./Modals/ModalViewProject";
-import ModalViewUser from "./Modals/ModalViewUser";
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from "moment";
 import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
-import ModalViewTransaction from "./Modals/ModalViewTransaction";
 
 export default function Plataforma() {
   const Sucesso = Swal.mixin({
@@ -61,11 +58,27 @@ export default function Plataforma() {
     setItemsTransactions(response.data);
   }
 
+  const MySwal = withReactContent(Swal);
 
   async function ViewTransaction(id) {
-    ViewItemsTransactions(id);
-    setShowModalViewTransaction(true);
-    forceUpdate();
+    var response = await Api.get('credito?id=' + id);
+
+
+    var value = parseFloat(response.data[0].creditAssigned);
+    value = value.toLocaleString('pt-br', { minimumFractionDigits: 2 });
+
+    var html =
+          '<p style="text-align:left;"><b>Projeto ID : </b><span>' + response.data[0].id + '</span></p>' +
+          '<p style="text-align:left;"><b>Crédito : </b><span>' + value + '</span></p>' +
+          '<p style="text-align:left;"><b>TX Hash  : </b><span>' + response.data[0].txhash + '</span></p>' +
+          '<p style="text-align:left;"><b>Bloco  : </b><span>' + response.data[0].block + '</span></p>'
+    
+        MySwal.fire({
+          width: 600,
+          html: html,
+          icon: 'info'
+        });
+
   }
 
   const style = { width: '90px' }
@@ -79,8 +92,6 @@ export default function Plataforma() {
   const [items, setItems] = useState([' ']);
   const [itemsUser, setItemsUser] = useState([' ']);
   const [showModalViewProject, setShowModalViewProject] = useState(false);
-  const [showModalViewUser, setShowModalViewUser] = useState(false);
-  const [showModalViewTransaction, setShowModalViewTransaction] = useState(false);
 
   const Toast = Swal.mixin({
     toast: true,
@@ -103,7 +114,6 @@ export default function Plataforma() {
       "data": "0x"
     };
 
-    console.log("block->", block);
     const response = await Api.post('transferir', block);
     if (response.status === 200){
       return true;
@@ -135,8 +145,6 @@ export default function Plataforma() {
     };
 
     const response = await Api.patch('/projeto', block);
-
-    console.log("status:", response.status);
 
     if (response.status === 200){
       return true;
@@ -191,22 +199,38 @@ export default function Plataforma() {
   
   const viewProjeto= async (id) => {
     const response = await Api.get('projeto?id=' + id);
-    setItems(response.data);
-    setShowModalViewProject(true);
+
+    const link = "http://localhost:3001/upload/" +response.data[0].documentation;
+
+    var html =
+    '<p style="text-align:left;"><b>Nome : </b><span>' + response.data[0].name + '</span></p>' +
+    '<p style="text-align:left;"><b>Descição : </b><span>' + response.data[0].description + '</span></p>' +
+    '<p style="text-align:left;"><b>Área  : </b><span>' + response.data[0].area + '</span></p>' +
+    '<p style="text-align:left;"><b>Estado  : </b><span>' + response.data[0].state + '</span></p>' +
+    '<p style="text-align:left;"><b>Atualização  : </b><span>' + response.data[0].updateDate + '</span></p>' +
+    '<p style="text-align:left;"><b>Arquivo  : </b><a href=' + link + '>' +  response.data[0].documentation + '</a></p>' +
+    '<p style="text-align:left;"><b>Hash do arquivo : </b><span>' + response.data[0].hash_documentation + '</span></p>'
+
+  MySwal.fire({
+    width: 600,
+    html: html,
+    icon: 'info'
+  });
+
   };
 
   const viewUser= async (user_id) => {
-    EditItemUser(user_id);
-    setShowModalViewUser(true);
+    const response = await Api.get('account/find/' + user_id);
+    Swal.fire({
+      title: response.data[0].name,
+      text: response.data[0].email,
+      imageUrl: response.data[0].image,
+      imageAlt: 'Custom image',
+    })
   };
 
 
   async function exeAposentar(block1, block2){
-
-    console.log(block1);
-
-    console.log(block2);
-
     const response2 = await Api.post('queimar', block1);
     const response1 = await Api.patch('/projeto', block2);
 
@@ -321,11 +345,9 @@ export default function Plataforma() {
 
   return (
     <div>
-      <Header />
-      <Sidenav />
-      {/* Content Wrapper. Contains page content */}
+      <Header key="header" />
+      <Sidenav key="sidenav"/>
       <div className="content-wrapper">
-        {/* Content Header (Page header) */}
         <div className="content-header">
           <div className="container-fluid">
             <div className="row mb-2">
@@ -381,7 +403,7 @@ export default function Plataforma() {
                   <th><center>Operação</center></th>
                 </tr>
               </thead>
-
+              <tbody>
               {projetos.map((data) => {
                 var valor = data.creditAssigned;
                 valor = parseFloat(valor);
@@ -402,26 +424,28 @@ export default function Plataforma() {
                 if (data.state === "adquirido"){
                   aposentar = true;
                 }
-
-                  return (<tr>
+               
+                  return (
+                    
+                  <tr>
                     <>
-                    <If condition={visible === true}>
+                    <If key={Math.random()} condition={visible === true}>
                       <Then>
-                      <td onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></td>
-                      <td onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
-                      <td onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
-                      <td onClick={() => viewUser(data.projectCreator)}><center>{data.projectOwner}</center></td>
-                      <td onClick={() => viewProjeto(data.state)}><center>{data.state}</center></td>
-                      <td onClick={() => viewProjeto(data.id)}><center>{valor}</center></td>
-                      <td><center><div>
-                      <If condition={adquirir === true}>
+                      <td key={data.id}><a href="#" onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></a></td>
+                      <td key={data.name}><a href="#" onClick={() => viewProjeto(data.id)}><center>{data.name}</center></a></td>
+                      <td key={Math.random()}><a href="#" onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></a></td>
+                      <td key={Math.random()}><a href="#" onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></a></td>
+                      <td key={Math.random()}><center>{data.state}</center></td>
+                      <td key={Math.random()}><center>{valor}</center></td>
+                      <td key={Math.random()}><center><div>
+                      <If key={Math.random()} condition={adquirir === true}>
                       <Then> 
-                      <Button style={style} className="btn btn-default" rounded variant="primary" size="sm" name="teste" onClick={() => comprarCredito(data.id, data.projectOwner, data.creditAssigned)}>Comprar</Button>
+                      <Button style={style} className="btn btn-default" variant="primary" size="sm" name="teste" onClick={() => comprarCredito(data.id, data.projectOwner, data.creditAssigned)}>Comprar</Button>
                       </Then>
                       </If>  
-                      <If condition={aposentar === true}>
+                      <If key={Math.random()} condition={aposentar === true}>
                       <Then> 
-                      <Button style={style} className="btn btn-default" rounded variant="success" size="sm" name="teste" onClick={() => aposentarCredito(data.id, data.creditAssigned)}>Aposentar</Button>
+                      <Button style={style} className="btn btn-default" variant="success" size="sm" name="teste" onClick={() => aposentarCredito(data.id, data.creditAssigned)}>Aposentar</Button>
                       </Then>
                       </If>  
                       </div></center></td>
@@ -432,19 +456,14 @@ export default function Plataforma() {
                   );
 
               })}
-              <tbody>
               </tbody>
             </table>
           </div>
         </section>
-        {/* /.content */}
-      </div>
-      {/* /.content-wrapper */}
-      <ModalViewProject title="Dados do Projeto" items={items} onClose={() => { setShowModalViewProject(false); }} show={showModalViewProject} />
-      <ModalViewUser title="Dados do Projeto" items={itemsUser} onClose={() => { setShowModalViewUser(false); }} show={showModalViewUser} />
-      <ModalViewTransaction title="Dados do Projeto" items={itemsTransactions} onClose={() => { setShowModalViewTransaction(false); }} show={showModalViewTransaction} />
 
-      <Footer />
+      </div>
+
+      <Footer key="footer"/>
     </div>
   )
 }
