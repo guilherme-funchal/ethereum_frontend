@@ -9,6 +9,7 @@ import Web3 from 'web3';
 import { useState, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
+import { height } from '@mui/system';
 
 export default function Tokens() {
 
@@ -262,7 +263,7 @@ export default function Tokens() {
        
     }, [])
 
-    const style = { width: '80px' }
+    const style = { width: '90px', height:'30px' }
 
     return (
         <div>
@@ -282,11 +283,11 @@ export default function Tokens() {
                 </div>
                 <section className="content">
                     <div className="container-fluid">
-                        <Button style={style} variant="primary" size="sm" onClick={doTokem}>
-                             Gerar
+                        <Button variant="primary" size="sm" onClick={doTokem}>
+                        <i class="fas fa-stamp"></i> Emitir
                         </Button>
-                        <Button style={style} variant="danger" size="sm"  onClick={burnTokem}>
-                            Queimar
+                        <Button variant="danger" size="sm"  onClick={burnTokem}>
+                        <i class="fas fa-fire"></i> Queimar
                         </Button>
                         <table className="blueTable">
                             <thead>

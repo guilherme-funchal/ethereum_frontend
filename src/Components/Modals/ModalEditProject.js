@@ -159,10 +159,10 @@ return ReactDOM.createPortal(
             </Form.Group>
             <div className="text-right">
               <Button variant="danger" onClick={props.onClose}>
-                Cancelar
+              <i class="fas fa-ban"></i>
               </Button>
               <Button variant="primary" type="submit">
-                Salvar
+              <i class="fas fa-check"></i>
               </Button>
             </div>
           </form>

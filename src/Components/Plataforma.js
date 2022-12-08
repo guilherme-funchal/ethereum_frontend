@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from "moment";
 import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
+import ModalViewProject from  "./Modals/ModalViewProject";
 
 export default function Plataforma() {
   const Sucesso = Swal.mixin({
@@ -37,11 +38,22 @@ export default function Plataforma() {
   const navigate = useNavigate();
   const [projetos, setProjetos] = useState([]);
   const [itemsTransactions, setItemsTransactions] = useState([' ']);
+  const [owner, setOwner] = useState(' ');
+  const [creator, setCreator] = useState(' ');
+  const [aprov, setAprov] = useState(' ');
 
   // const getUsuarios = async () => {
   //   const response = await Api.get('saldo-contas?wallet=1');
   //   setUsuarios(response.data);
   // };
+
+  const resumoProjeto = async (id) => {
+    var response = await Api.get('projeto?id=' + id);
+    setItems(response.data);
+    var response = await Api.get('credito?id=' + id);
+    setItemsTransactions(response.data);
+    setShowModalViewProject(true);
+  }
 
   const getTaxas = async () => {
     const response = await Api.get('tax/list');
@@ -394,7 +406,7 @@ export default function Plataforma() {
             <table className="blueTable">
               <thead>
                 <tr>
-                  <th><center>Projeto ID</center></th>
+                  <th><center>Transação</center></th>
                   <th><center>Nome do projeto</center></th>
                   <th><center>Proprietário</center></th>
                   <th><center>Criador</center></th>
@@ -413,7 +425,7 @@ export default function Plataforma() {
                 var adquirir = true;
                 var aposentar = false;
                 
-                if (data.projectOwner === "0x0000000000000000000000000000000000000000" || data.state === "enviado" || data.state === "rascunho" ){
+                if (data.projectOwner === "0x0000000000000000000000000000000000000000" || data.state === "enviado" || data.state === "rascunho" || data.state === "rejeitado"){
                   visible = false;
                 }
 
@@ -440,14 +452,21 @@ export default function Plataforma() {
                       <td key={Math.random()}><center><div>
                       <If key={Math.random()} condition={adquirir === true}>
                       <Then> 
-                      <Button style={style} className="btn btn-default" variant="primary" size="sm" name="teste" onClick={() => comprarCredito(data.id, data.projectOwner, data.creditAssigned)}>Comprar</Button>
+                      <Button className="btn btn-default" variant="primary" size="sm" name="teste" onClick={() => comprarCredito(data.id, data.projectOwner, data.creditAssigned)}> <i class="ion ion-bag"></i> Comprar</Button>
+                      <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
                       </Then>
                       </If>  
                       <If key={Math.random()} condition={aposentar === true}>
                       <Then> 
-                      <Button style={style} className="btn btn-default" variant="success" size="sm" name="teste" onClick={() => aposentarCredito(data.id, data.creditAssigned)}>Aposentar</Button>
+                      <Button className="btn btn-default" variant="danger" size="sm" name="teste" onClick={() => aposentarCredito(data.id, data.creditAssigned)}><i class="ion ion-pie-graph"></i> Aposentar</Button>
+                      <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
                       </Then>
                       </If>  
+                      <If key={Math.random()} condition={adquirir === false}>
+                      <Then>
+                      <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
+                      </Then>   
+                      </If>
                       </div></center></td>
                       </Then>
                     </If>    
@@ -462,7 +481,7 @@ export default function Plataforma() {
         </section>
 
       </div>
-
+      <ModalViewProject  owner={owner} creator={creator} aprov={aprov} items={items} itemsTransactions={itemsTransactions} setShowModalViewProject={setShowModalViewProject} onClose={() => setShowModalViewProject(false)} show={showModalViewProject}/>
       <Footer key="footer"/>
     </div>
   )

@@ -58,12 +58,30 @@ export default function Header() {
       if (result.isConfirmed) {
         localStorage.removeItem('wallet');
         navigate("/");
-        navigate(0);
-        Swal.fire(
-          'Desconectado!',
-          'Você foi desconentado',
-          'success'
-        )
+        // navigate(0);
+
+        // Swal.fire(
+        //   'Desconectado!',
+        //   'Você foi desconentado',
+        //   'success'
+        // )
+        let timerInterval;
+        Swal.fire({
+          title: "Desconectado",
+          text: "Faça o login novamente",
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: true,
+          didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          }
+        })
+
       }
     })
   }

@@ -332,11 +332,11 @@ function ModalAddUser(props) {
               </Form.Group>
               <br></br>
               <div className="text-right">
-                <Button variant="danger" onClick={props.onClose}>
-                  Cancelar
+                <Button variant="danger" onClick={props.onClose} size="sm">
+                <i class="fas fa-trash"> Cancela</i>
                 </Button>
-                <Button variant="primary" type="submit">
-                  Salvar
+                <Button variant="primary" type="submit" size="sm">
+                <i class="fas fa-check"> Salvar</i>
                 </Button>
               </div>
             </form>

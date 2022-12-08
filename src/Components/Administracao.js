@@ -21,6 +21,16 @@ export default function Administracao() {
         { heading: 'Tipo', value: 'type' },
     ]
 
+    async function viewUser(user_id) {
+        var response = await Api.get('account/find/' + user_id);
+        Swal.fire({
+          title: response.data[0].name,
+          text: response.data[0].email,
+          imageUrl: response.data[0].image,
+          imageAlt: 'Custom image',
+        })
+    }
+
     const getUsers = async () => {
         const response = await Api.get('account/list');
         setUsers(response.data);
@@ -159,41 +169,41 @@ export default function Administracao() {
                 <section className="content">
                     <div className="container-fluid">
                         <Button variant="primary" size="sm" onClick={() => setShowModalAddUser(true)}>
-                            Novo usuário
+                        <i class="fas fa-user"></i> Novo
                         </Button>
                         <table className="blueTable">
                             <thead>
                                 <tr>
-                                    <th><center>User ID</center></th>
                                     <th><center>Nome</center></th>
                                     <th><center>Email</center></th>
+                                    <th><center>User ID</center></th>
                                     <th><center>Perfil</center></th>
-                                    <th><center>Tipo</center></th>
+                                    {/* <th><center>Tipo</center></th> */}
                                     <th><center>Operação</center></th>
                                 </tr>
                             </thead>
 
                             {users.map((data) => {
                                 var visible = true;
-                                const style = { width: '60px' }
+                                const style = { width: '30px' }
                                 if (data.user_id === "0x0000000000000000000000000000000000000000"){
                                     visible = false;
                                 }
                                 return (
                                     <If condition={visible === true}>
                                     <Then>
-                                    <tr>
-                                    <td><center>{data.user_id}</center></td>
+                                    <tr> 
                                     <td><center>{data.name}</center></td>
                                     <td><center>{data.email}</center></td>
+                                    <td key={data.user_id}><a href="#" onClick={() => viewUser(data.user_id)}><center>{data.user_id}</center></a></td> 
                                     <td><center>{data.profile}</center></td>
-                                    <td><center>{data.type}</center></td>
+                                    {/* <td><center>{data.type}</center></td> */}
                                     <td><center> <div>
-                                        <Button style={style} variant="primary" size="sm" onClick={() => editUser(data.user_id)}>
-                                            Editar
+                                        <Button className="btn btn-default" variant="primary" size="sm" onClick={() => editUser(data.user_id)}>
+                                        <i class="fas fa-pen"> Edita</i> 
                                         </Button>
-                                        <Button style={style} variant="danger" size="sm" onClick={() => delUsuario(data.user_id)}>
-                                            Excluir
+                                        <Button className="btn btn-default" variant="danger" size="sm" onClick={() => delUsuario(data.user_id)}>
+                                        <i class="fas fa-trash"> Exclui</i> 
                                         </Button>
                                     </div>
                                     </center></td>

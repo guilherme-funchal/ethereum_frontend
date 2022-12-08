@@ -242,8 +242,8 @@ export default function Transfer() {
                 </div>
                 <section className="content">
                     <div className="container-fluid">
-                        <Button style={style} variant="primary" size="sm" onClick={doTransfer}>
-                             Nova
+                        <Button variant="primary" size="sm" onClick={doTransfer}>
+                        <i class="fas fa-plus"></i> Nova
                         </Button>
                         <table className="blueTable">
                             <thead>
