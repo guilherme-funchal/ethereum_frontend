@@ -58,13 +58,8 @@ export default function Header() {
       if (result.isConfirmed) {
         localStorage.removeItem('wallet');
         navigate("/");
-        // navigate(0);
+        navigate(0);
 
-        // Swal.fire(
-        //   'Desconectado!',
-        //   'Você foi desconentado',
-        //   'success'
-        // )
         let timerInterval;
         Swal.fire({
           title: "Desconectado",
@@ -113,14 +108,14 @@ export default function Header() {
                     <>
                       <div className="topnav-right">
                         <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUpDirect}>
-                          <i className="fa fa-paper-plane fa-1" />
+                          <i className="fa fa fa-lock fa-1" />
                         </a>
                       </div>
-                      <div className="topnav-right">
+                      {/* <div className="topnav-right">
                         <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUp}>
                           <i className="fa fa-lock" />
                         </a>
-                      </div>
+                      </div> */}
                     </>
                   )
                   : (

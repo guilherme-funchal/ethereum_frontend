@@ -424,6 +424,7 @@ export default function Plataforma() {
                 var visible = true;
                 var adquirir = true;
                 var aposentar = false;
+                var aposentado = false;
                 
                 if (data.projectOwner === "0x0000000000000000000000000000000000000000" || data.state === "enviado" || data.state === "rascunho" || data.state === "rejeitado"){
                   visible = false;
@@ -436,6 +437,11 @@ export default function Plataforma() {
                 if (data.state === "adquirido"){
                   aposentar = true;
                 }
+
+                if (data.state === "aposentado"){
+                  aposentado = true;
+                }
+
                
                   return (
                     
@@ -462,7 +468,7 @@ export default function Plataforma() {
                       <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
                       </Then>
                       </If>  
-                      <If key={Math.random()} condition={adquirir === false}>
+                      <If key={Math.random()} condition={aposentado === true}>
                       <Then>
                       <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
                       </Then>   
