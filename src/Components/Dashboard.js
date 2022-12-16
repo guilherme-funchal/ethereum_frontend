@@ -2,38 +2,12 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidenav from './Sidenav';
 import Api from '../Api';
-import Modal from 'react-bootstrap/Modal';
 import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
-import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
 import Web3 from 'web3';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 
 export default function Projetos() {
-    const Sucesso = Swal.mixin({
-        toast: true,
-        position: 'center',
-        iconColor: 'green',
-        customClass: {
-            popup: 'colored-toast'
-        },
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true
-    });
-
-    const Falha = Swal.mixin({
-        toast: true,
-        position: 'center',
-        iconColor: 'falha',
-        customClass: {
-            popup: 'colored-toast'
-        },
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true
-    });
-
     const getTransactions = async () => {
         const response = await Api.get('transacoes');
         setTransactions(response.data);
@@ -64,8 +38,6 @@ export default function Projetos() {
     const [transactions, setTransactions] = useState([]);
     const [carbono, setCarbono] = useState([]);
     const [moeda, setMoeda] = useState([]);
-    const [itemsUser, setItemsUser] = useState([' ']);
-    const [showModalViewUser, setShowModalViewUser] = useState(false);
 
     async function doTimestamp(param) {
         const block = { block: param };
@@ -80,12 +52,7 @@ export default function Projetos() {
         });
     }
 
-    
-    async function EditItemUser(user_id) {
-        var response = await Api.get('account/find/' + user_id);
-        setItemsUser(response.data);
-    }
-    
+   
     async function viewUser(user_id) {
         const response = await Api.get('account/find/' + user_id);
         Swal.fire({
@@ -192,38 +159,31 @@ export default function Projetos() {
                             <tbody>
                                 {transactions.map((obj) => {
 
-                                    var visible = false;
-                                    var aposentar = false;
-
-                                    if (user[0]?.profile === "certificador" || user[0]?.profile === "registrador") {
-                                        visible = true;
-                                    }
+                                    var visible = true;
 
                                     const val = obj.returnValues;
                                     let from = "";
                                     let id = "";
                                     let to = "";
-                                    let operator = "";
                                     let value = "";
                                     let transferencia = "Transferir";
-                                    let count = 0;
 
                                     for (const key in val) {
-                                        if (key === "operator") {
-                                            operator = `${val[key]}`;
-                                        }
-                                        else if (key === "from") {
+                                        if (key === "from") {    
                                             from = `${val[key]}`;
                                             if (from === "0x0000000000000000000000000000000000000000" && obj.event === "TransferSingle") {
                                                 transferencia = "Cunhar";
                                             }
                                         }
-                                        else if (key === "to") {
+                                        if (key === "to") {    
                                             to = `${val[key]}`;
                                             if (to === "0x0000000000000000000000000000000000000000" && obj.event === "TransferSingle") {
                                                 transferencia = "Aposentar";
                                             }
                                         }
+                                        // else if (key === "to") {
+                                        //     to = `${val[key]}`;
+                                        // }
                                         else if (key === "id") {
                                             id = `${val[key]}`;
                                             if (id === "1") {
@@ -232,52 +192,33 @@ export default function Projetos() {
                                                 id = "Moeda";
                                             }
                                         }
+                                        
                                         else if (key === "value") {
                                             value = `${val[key]}`;
                                             value = Web3.utils.fromWei(value, 'ether');
                                             value = parseFloat(value);
-                                            // value = value.toLocaleString('pt-br', { minimumFractionDigits: 2 });
                                         }
                                     }
 
-                                    // if (from === "0x0000000000000000000000000000000000000000") {
-                                    //     from = "Smart contract"
-                                    // }
-
 
                                     if (user[0]?.profile === "certificador" || user[0]?.profile === "registrador" || user[0]?.user_id === to || user[0]?.user_id === from) {
-                                        visible = true;
+                                        visible = false;
                                     }
-
-                                    if (id === "Carbono" && user[0]?.profile === "comprador" && transferencia !== "Aposentar") {
-                                        aposentar = true;
-                                    }
-
-                                    return (
-                                        <If key={Math.random()} condition={visible === true}>
-                                            <Then>
-                                                <tr>
+                                    
+                                    return (     
+                                        visible ? null
+                                        : (
+                                                <tr style={{ cursor: "pointer" }}>
                                                     <td key={transferencia}><center>{transferencia}</center></td>
                                                     <td key={obj.blockNumber}><center>{obj.blockNumber}</center></td>
-                                                    <td key={from}><a href="#"  onClick={() => viewUser(from)}><center>{from}</center></a></td>
-                                                    <td key={to}><a href="#" onClick={() => viewUser(to)}><center>{to}</center></a></td>
+                                                    <td key={from} onClick={() => viewUser(from)}><center>{from}</center></td>
+                                                    <td key={to} onClick={() => viewUser(to)}><center>{to}</center></td>
                                                     <td key={value}><center>{value.toLocaleString('pt-br', { minimumFractionDigits: 2 })}</center></td>
                                                     <td key={id}><center>{id}</center></td>
-                                                    {/* <If condition={id === "Carbono"}>
-                                                    <Then>
-                                                    <td><center><i className="ion ion-leaf" style={{ fontSize: "30px" }}></i></center></td>
-                                                    </Then>
-                                                    </If>
-                                                    <If condition={id === "Moeda"}>
-                                                    <Then>
-                                                    <td><center><i className="ion ion-cash" style={{ fontSize: "30px" }}></i></center></td>
-                                                    </Then>
-                                                    </If> */}
                                                     <td><center><button className="btn text-red btn-sm" onClick={event => { doTimestamp(obj.blockNumber); }}
                                                     ><i className="fa fa-clock fa-fw" style={{ fontSize: "15px" }}></i></button></center></td>
                                                 </tr>
-                                            </Then>
-                                        </If>
+                                        )        
                                     );
 
                                 })}

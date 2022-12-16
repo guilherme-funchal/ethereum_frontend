@@ -1,66 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Button,Col } from "react-bootstrap";
 import Api from '../../Api';
 import Swal from 'sweetalert2';
-// import withReactContent from 'sweetalert2-react-content';
 import { Controller, useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
-// import Select from 'react-select';
 
 function ModalAddUser(props) {
 
-  const options = [
-    { value: 'certificador', label: 'certificador' },
-    { value: 'registrador', label: 'registrador' },
-    { value: 'propositor', label: 'propositor' },
-    { value: 'comprador', label: 'comprador' },
-  ];
-
-  const [selectedOption, setSelectedOption] = useState(null);
-
-  const [userName, setName] = useState("");
   const [userProfile, setProfile] = useState("");
-  const [userDesc, setDesc] = useState("");
-  const [userEmail, setEmail] = useState("");
   const [userType, setType] = useState("");
-  const [userDoc, setDoc] = useState("");
-  const [userImage, setImage] = useState("");
-  const [userId, setUserId] = useState("");
   const [current, setCurrent] = useState("");
-
-  const closeOnEscapeKeyDown = e => {
-    if ((e.charCode || e.keyCode) === 27) {
-      props.onClose();
-    }
-  };
-
-  const [, setValues] = useState({
-    id: 0,
-    state: ""
-  });
-
-  const inputRef = useRef()
-
-  const address = localStorage.getItem('wallet');
-
-  const [file, setFile] = useState('');
-  const [status, setStatus] = useState({
-    type: '',
-    mensagem: ''
-  });
-
-  const handlesubmit = () => {
-    form.current.reset(); //this will reset all the inputs in the form
-  }
-
-  function resetForm() {
-    document.getElementById("form").reset();
-  }
-
-  const reload = () => window.location.reload();
   const form = useRef(null);
 
   useEffect(() => {
@@ -71,12 +23,6 @@ function ModalAddUser(props) {
 
   }, [])
 
-  const onChange = (e) => {
-    setValues({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
 
   const Toast = Swal.mixin({
     toast: true,
@@ -90,16 +36,8 @@ function ModalAddUser(props) {
     timerProgressBar: true
   });
 
-  var name = "";
-  var user_id = "";
   var profile = "";
-  var desc = "";
-  var email = "";
   var type = "";
-  var doc = "";
-  var created_at = "";
-  var last_login = "";
-  var image = "";
 
   const {
     control,
@@ -122,10 +60,8 @@ function ModalAddUser(props) {
   });
 
   async function submitForm(data) {
-    var response = "";
     const id = await Api.get('account-lists/list');
-    response = await Api.delete('account-lists/delete/' + id.data[0].user_id);
-    const form = data.currentTarget;
+    await Api.delete('account-lists/delete/' + id.data[0].user_id);
 
     const block = {
       "user_id": id.data[0].user_id,
@@ -141,7 +77,7 @@ function ModalAddUser(props) {
       "image": data.image
     };
 
-    response = await Api.post('account/add/', block);
+    await Api.post('account/add/', block);
 
     await Toast.fire({
       icon: 'success',
@@ -170,7 +106,6 @@ function ModalAddUser(props) {
                 <Controller
                   name="name"
                   control={control}
-                  onChange={(e) => setName(e.target.value)}
                   rules={{ required: true }}
                   render={({ field }) => (
                     <Form.Control
@@ -194,7 +129,6 @@ function ModalAddUser(props) {
                 <Controller
                   name="desc"
                   control={control}
-                  onChange={(e) => setDesc(e.target.value)}
                   rules={{ required: true }}
                   render={({ field }) => (
                     <Form.Control
@@ -215,11 +149,6 @@ function ModalAddUser(props) {
               </Form.Group>
               <Form.Group as={Col} md="20" controlId="validationCustom01">
                 <Form.Label>Profile</Form.Label><br></br>
-                {/* <Select
-                defaultValue={selectedOption}
-                onChange={setSelectedOption}
-                options={options}
-              /> */}
                 <select name="profile" value={profile} onChange={texto => setProfile(texto.target.value)}>
                   <option value="">Selecione um perfil</option>
                   <option value="certificador">Certificador</option>
@@ -233,7 +162,7 @@ function ModalAddUser(props) {
                 <Controller
                   name="email"
                   control={control}
-                  onChange={(e) => setEmail(e.target.value)}
+                  // onChange={(e) => setEmail(e.target.value)}
                   rules={{ required: true }}
                   render={({ field }) => (
                     <Form.Control
@@ -260,34 +189,11 @@ function ModalAddUser(props) {
                   <option value="pj">Pessoa Jurídica</option>
                 </select><br /><br />
               </Form.Group>  
-                {/* <Controller
-                  name="type"
-                  control={control}
-                  onChange={(e) => setType(e.target.value)}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <Form.Control
-                      {...field}
-                      type="text"
-                      placeholder="tipo"
-                      isInvalid={errors.type}
-                    />
-                  )}
-                />
-                {errors.type && (
-                  <div className="invalid-feedback">
-                    <Form.Control.Feedback type="invalid">
-                      O campo é requerido
-                    </Form.Control.Feedback>
-                  </div>
-                )}
-              </Form.Group> */}
               <Form.Group as={Col} md="20" controlId="validationCustom01">
                 <Form.Label>Documento(CPF - RG -CNPJ)</Form.Label>
                 <Controller
                   name="doc"
                   control={control}
-                  onChange={(e) => setDoc(e.target.value)}
                   rules={{ required: true }}
                   render={({ field }) => (
                     <Form.Control
@@ -311,7 +217,6 @@ function ModalAddUser(props) {
                 <Controller
                   name="image"
                   control={control}
-                  onChange={(e) => setImage(e.target.value)}
                   rules={{ required: true }}
                   render={({ field }) => (
                     <Form.Control

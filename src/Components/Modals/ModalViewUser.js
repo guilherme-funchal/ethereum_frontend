@@ -1,26 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
-import { Form, Button, Row, Col } from "react-bootstrap";
-import Api from '../../Api';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-import { Controller, useForm } from "react-hook-form";
+import { Button } from "react-bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import moment from "moment";
-import { Modal } from "bootstrap";
 
 
-
-function ModalViewProjeto(props) {
-
-  const link = "http://localhost:3001/upload/" + props.items[0].documentation;
-
-  const closeOnEscapeKeyDown = e => {
-    if ((e.charCode || e.keyCode) === 27) {
-      props.onClose();
-    }
-  };
+function ModalViewUser(props) {
 
   const style = { width: '430px' }
 
@@ -64,4 +49,4 @@ function ModalViewProjeto(props) {
   );
 };
 
-export default ModalViewProjeto;
+export default ModalViewUser;

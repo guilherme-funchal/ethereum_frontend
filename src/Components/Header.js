@@ -1,10 +1,8 @@
 import React from 'react';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Api from '../Api';
-import { ethers } from 'ethers';
 
 export default function Header() {
 
@@ -14,13 +12,8 @@ export default function Header() {
   }, [])
 
   const [wallet, setWallet] = useState('');
-  const MySwal = withReactContent(Swal);
   const navigate = useNavigate();
   const [error, setError] = useState('');
-
-  function refreshPage() {
-    window.location.reload(false);
-  }
 
   async function doSignUpDirect() {
     setError('');
@@ -60,7 +53,6 @@ export default function Header() {
         navigate("/");
         navigate(0);
 
-        let timerInterval;
         Swal.fire({
           title: "Desconectado",
           text: "Faça o login novamente",
@@ -71,7 +63,7 @@ export default function Header() {
           didOpen: () => {
             Swal.showLoading()
             const b = Swal.getHtmlContainer().querySelector('b')
-            timerInterval = setInterval(() => {
+            setInterval(() => {
               b.textContent = Swal.getTimerLeft()
             }, 100)
           }
@@ -81,21 +73,21 @@ export default function Header() {
     })
   }
 
-  async function doSignUp() {
-    setError('');
+  // async function doSignUp() {
+  //   setError('');
 
-    if (!window.ethereum) return MySwal.fire(<p><h6><b>Carteira não encontrada</b></h6></p>);
+  //   if (!window.ethereum) return MySwal.fire(<p><h6><b>Carteira não encontrada</b></h6></p>);
 
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const accounts = await provider.send("eth_requestAccounts", []);
-      if (!accounts || !accounts.length) return MySwal.fire(<p><h6><b>Carteira não encontrada</b></h6></p>);
-      localStorage.setItem('wallet', accounts[0]);
-      window.location.reload(false);
-    } catch (err) {
-      setError(err.message);
-    }
-  }
+  //   try {
+  //     const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //     const accounts = await provider.send("eth_requestAccounts", []);
+  //     if (!accounts || !accounts.length) return MySwal.fire(<p><h6><b>Carteira não encontrada</b></h6></p>);
+  //     localStorage.setItem('wallet', accounts[0]);
+  //     window.location.reload(false);
+  //   } catch (err) {
+  //     setError(err.message);
+  //   }
+  // }
 
   return (
     <div>
@@ -107,9 +99,9 @@ export default function Header() {
                   ? (
                     <>
                       <div className="topnav-right">
-                        <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUpDirect}>
+                        <div className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUpDirect}>
                           <i className="fa fa fa-lock fa-1" />
-                        </a>
+                        </div>
                       </div>
                       {/* <div className="topnav-right">
                         <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doSignUp}>
@@ -122,9 +114,9 @@ export default function Header() {
                     <>
                       <div className="topnav-right">
 
-                        <a className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doLogout}>
+                        <div className="nav-link" data-widget="control-sidebar" data-slide="true" onClick={doLogout}>
                           <i className="fa fa-unlock-alt" />
-                        </a>
+                        </div>
                       </div>
                     </>
                   )

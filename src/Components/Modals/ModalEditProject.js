@@ -1,28 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import Api from '../../Api';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
 import { Controller, useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
 
 function ModalEditProjeto (props) {
-  
-  const closeOnEscapeKeyDown = e => {
-    if ((e.charCode || e.keyCode) === 27) {
-      props.onClose();
-    }
-  };
-  
-  const [inputs, setInputs] = useState({});
-  const [validated, setValidated] = useState(false);
-  const [selected, setSelected] = useState('yes');
-  
+   
   var state = props.items[0].state;
-  var area = props.items[0].area;
   var area = props.items[0].area;
   var id = props.items[0].id;
   var name = props.items[0].name;
@@ -33,34 +20,24 @@ function ModalEditProjeto (props) {
   var documentation = props.items[0].documentation;
   var hash_documentation = props.items[0].hash_documentation;
 
-  const handlesubmit = () => {
-    form.current.reset(); //this will reset all the inputs in the form
-  }
-
-  function resetForm() {
-    document.getElementById("form").reset();
-  }
-
-  // const reload = () => window.location.reload();
   const form = useRef(null);
   
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    // formState: { errors },
   } = useForm({
   });
 
 
   async function submitForm(data){
-    const form = data.currentTarget;    
+    // const form = data.currentTarget;    
     var block = ""
-    var response = '';
     var current = moment()
       .utcOffset('-03:00')
       .format('DD/MM/YYYY hh:mm:ss a');
     
-    if (state == "on"){
+    if (state === "on"){
       state = "enviado";
     }
 
@@ -79,9 +56,10 @@ function ModalEditProjeto (props) {
       "updateDate": String(current)
     };
 
-    response = await Api.patch('/projeto', block);
+    await Api.patch('/projeto', block);
     props.onClose();
   }
+  const style = { width: '85px' }
 
 return ReactDOM.createPortal(
   <CSSTransition
@@ -157,12 +135,13 @@ return ReactDOM.createPortal(
                 onChange={(e) => area=e.target.value}
                 />  
             </Form.Group>
+            <br></br>
             <div className="text-right">
-              <Button variant="danger" onClick={props.onClose}>
-              <i class="fas fa-ban"></i>
+            <Button style={style} variant="danger" onClick={props.onClose} size="sm">
+              <i class="fas fa-ban"></i> Cancela
               </Button>
-              <Button variant="primary" type="submit">
-              <i class="fas fa-check"></i>
+              <Button style={style} variant="primary" type="submit" size="sm">
+              <i class="fas fa-check"></i> Salvar
               </Button>
             </div>
           </form>

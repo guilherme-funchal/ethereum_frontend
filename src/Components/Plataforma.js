@@ -5,10 +5,9 @@ import Api from '../Api';
 import { Button } from 'react-bootstrap/';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from "moment";
-import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
 import ModalViewProject from  "./Modals/ModalViewProject";
 
 export default function Plataforma() {
@@ -38,19 +37,10 @@ export default function Plataforma() {
   const navigate = useNavigate();
   const [projetos, setProjetos] = useState([]);
   const [itemsTransactions, setItemsTransactions] = useState([' ']);
-  const [owner, setOwner] = useState(' ');
-  const [creator, setCreator] = useState(' ');
-  const [aprov, setAprov] = useState(' ');
-
-  // const getUsuarios = async () => {
-  //   const response = await Api.get('saldo-contas?wallet=1');
-  //   setUsuarios(response.data);
-  // };
-
   const resumoProjeto = async (id) => {
     var response = await Api.get('projeto?id=' + id);
     setItems(response.data);
-    var response = await Api.get('credito?id=' + id);
+    response = await Api.get('credito?id=' + id);
     setItemsTransactions(response.data);
     setShowModalViewProject(true);
   }
@@ -65,10 +55,10 @@ export default function Plataforma() {
     setProjetos(response.data);
   };
 
-  async function ViewItemsTransactions(id) {
-    var response = await Api.get('credito?id=' + id);
-    setItemsTransactions(response.data);
-  }
+  // async function ViewItemsTransactions(id) {
+  //   var response = await Api.get('credito?id=' + id);
+  //   setItemsTransactions(response.data);
+  // }
 
   const MySwal = withReactContent(Swal);
 
@@ -93,29 +83,29 @@ export default function Plataforma() {
 
   }
 
-  const style = { width: '90px' }
+  // const style = { width: '90px' }
   const [taxas, setTaxas] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
+  // const [usuarios, setUsuarios] = useState([]);
   const [user, setUser] = useState([]);
   const [saldoCarbono, setCarbono] = useState('');
   const [saldoMoeda, setMoeda] = useState([]);
-  const forceUpdate = useCallback(() => updateState({}), [])
-  const [, updateState] = useState();
+  // const forceUpdate = useCallback(() => updateState({}), [])
+  // const [, updateState] = useState();
   const [items, setItems] = useState([' ']);
-  const [itemsUser, setItemsUser] = useState([' ']);
+  // const [itemsUser, setItemsUser] = useState([' ']);
   const [showModalViewProject, setShowModalViewProject] = useState(false);
 
-  const Toast = Swal.mixin({
-    toast: true,
-    position: 'bottom-right',
-    iconColor: 'green',
-    customClass: {
-      popup: 'colored-toast'
-    },
-    showConfirmButton: false,
-    timer: 2500,
-    timerProgressBar: true
-  });
+  // const Toast = Swal.mixin({
+  //   toast: true,
+  //   position: 'bottom-right',
+  //   iconColor: 'green',
+  //   customClass: {
+  //     popup: 'colored-toast'
+  //   },
+  //   showConfirmButton: false,
+  //   timer: 2500,
+  //   timerProgressBar: true
+  // });
 
   async function doTransfer(origem, destino, id, valor) {
     var block = {
@@ -199,20 +189,11 @@ export default function Plataforma() {
     await setMoeda(moeda);
   };
   
-  const EditItemsProject = async (id) => {
-    const response = await Api.get('projeto?id=' + id);
-    setItems(response.data);
-  };
-  
-  const EditItemUser = async (user_id) => {
-    const response = await Api.get('account/find/' + user_id);
-    setItemsUser(response.data);
-  };
   
   const viewProjeto= async (id) => {
     const response = await Api.get('projeto?id=' + id);
 
-    const link = "http://localhost:3001/upload/" +response.data[0].documentation;
+    const link = process.env.REACT_APP_REST_HOST + "/upload/" + response.data[0].documentation;
 
     var html =
     '<p style="text-align:left;"><b>Nome : </b><span>' + response.data[0].name + '</span></p>' +
@@ -243,8 +224,8 @@ export default function Plataforma() {
 
 
   async function exeAposentar(block1, block2){
-    const response2 = await Api.post('queimar', block1);
-    const response1 = await Api.patch('/projeto', block2);
+    await Api.post('queimar', block1);
+    await Api.patch('/projeto', block2);
 
     Sucesso.fire({
       icon: 'success',
@@ -275,7 +256,7 @@ export default function Plataforma() {
 
 
     (async () => {
-      const { value: text } = await Swal.fire({
+      await Swal.fire({
         title: 'Aposentar o crédito de carbono ?',
         icon: 'question',
         showDenyButton: true,
@@ -310,10 +291,8 @@ export default function Plataforma() {
   }
 
   async function comprarCredito(project_id, vendedor, credito) {
-    var test = true;
     var moeda = credito * taxas.moeda;
     moeda = parseFloat(moeda);
-    var block = "";
     var profile = user[0].profile;
     var comprador = user[0].user_id;
 
@@ -344,16 +323,18 @@ export default function Plataforma() {
 
   useEffect(() => {
     var address = localStorage.getItem('wallet');
-    if (address !== null) {
+    var user_data = JSON.parse(address);
+
+    if (user_data[0].profile === 'registrador' ||  user_data[0].profile === 'certificador' ||  user_data[0].profile === 'comprador') {
       setUser(JSON.parse(address));
       getTaxas();
       getProjetos();
       getSaldos(JSON.parse(address));
     } else {
-      setUser(false);
+        navigate("/Erro");
     }
 
-  }, []);
+  }, [navigate]);
 
   return (
     <div>
@@ -425,9 +406,14 @@ export default function Plataforma() {
                 var adquirir = true;
                 var aposentar = false;
                 var aposentado = false;
+                var perfil = true;
                 
                 if (data.projectOwner === "0x0000000000000000000000000000000000000000" || data.state === "enviado" || data.state === "rascunho" || data.state === "rejeitado"){
                   visible = false;
+                }
+
+                if (user[0].profile === 'certificador'){
+                  perfil = false;
                 }
 
                 if (data.state === "adquirido" || data.state === "aposentado" || data.state === "enviado" ){
@@ -445,41 +431,43 @@ export default function Plataforma() {
                
                   return (
                     
-                  <tr>
-                    <>
-                    <If key={Math.random()} condition={visible === true}>
-                      <Then>
-                      <td key={data.id}><a href="#" onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></a></td>
-                      <td key={data.name}><a href="#" onClick={() => viewProjeto(data.id)}><center>{data.name}</center></a></td>
-                      <td key={Math.random()}><a href="#" onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></a></td>
-                      <td key={Math.random()}><a href="#" onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></a></td>
+                  <tr  style={{ cursor: "pointer" }}>
+                    {visible === true &&
+                      <>
+                      <td key={data.id} onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></td>
+                      <td key={data.name} onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
+                      <td key={Math.random()} onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
+                      <td key={Math.random()} onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></td>
                       <td key={Math.random()}><center>{data.state}</center></td>
                       <td key={Math.random()}><center>{valor}</center></td>
                       <td key={Math.random()}><center><div>
-                      <If key={Math.random()} condition={adquirir === true}>
-                      <Then> 
-                      <Button className="btn btn-default" variant="primary" size="sm" name="teste" onClick={() => comprarCredito(data.id, data.projectOwner, data.creditAssigned)}> <i class="ion ion-bag"></i> Comprar</Button>
-                      <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
-                      </Then>
-                      </If>  
-                      <If key={Math.random()} condition={aposentar === true}>
-                      <Then> 
+
+                      {adquirir === true &&
+                      <>
+                      {perfil === true &&
+                        <Button className="btn btn-default" variant="primary" size="sm" name="teste" onClick={() => comprarCredito(data.id, data.projectOwner, data.creditAssigned)}> <i class="ion ion-bag"></i> Comprar</Button>
+                      }
+                        <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
+                      </>
+                      }
+
+                      {aposentar === true &&
+                      <>
+                      {perfil === true &&
                       <Button className="btn btn-default" variant="danger" size="sm" name="teste" onClick={() => aposentarCredito(data.id, data.creditAssigned)}><i class="ion ion-pie-graph"></i> Aposentar</Button>
+                      }
                       <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
-                      </Then>
-                      </If>  
-                      <If key={Math.random()} condition={aposentado === true}>
-                      <Then>
+                      </>
+                      } 
+
+                      {aposentado === true &&
                       <Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualizar</Button>
-                      </Then>   
-                      </If>
+                      }
                       </div></center></td>
-                      </Then>
-                    </If>    
-                    </>
+                      </>
+                    }    
                   </tr>
                   );
-
               })}
               </tbody>
             </table>
@@ -487,7 +475,7 @@ export default function Plataforma() {
         </section>
 
       </div>
-      <ModalViewProject  owner={owner} creator={creator} aprov={aprov} items={items} itemsTransactions={itemsTransactions} setShowModalViewProject={setShowModalViewProject} onClose={() => setShowModalViewProject(false)} show={showModalViewProject}/>
+      <ModalViewProject  items={items} itemsTransactions={itemsTransactions} setShowModalViewProject={setShowModalViewProject} onClose={() => setShowModalViewProject(false)} show={showModalViewProject}/>
       <Footer key="footer"/>
     </div>
   )

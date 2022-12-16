@@ -33,7 +33,7 @@ export default function Home() {
               </div>
 
               <div className="card-footer">
-                <img className="img-fluid" src="dist/img/dapp.png" width="30%" height="30%"></img>
+                <img className="img-fluid" src="dist/img/dapp.png" width="30%" height="30%" alt="imagem"></img>
               </div>
             </div>
           </div>

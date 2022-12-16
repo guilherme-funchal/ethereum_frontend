@@ -1,29 +1,28 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Button, Col } from "react-bootstrap";
 import api from '../../Api';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
 
 function ModalEditUser (props) {
 
-  const [userName, setName] = useState("");
+  // const [userName, setName] = useState("");
   const [userProfile, setProfile] = useState(props.items[0].profile);
-  const [userDesc, setDesc] = useState("");
-  const [userEmail, setEmail] = useState("");
+  // const [userDesc, setDesc] = useState("");
+  // const [userEmail, setEmail] = useState("");
   const [userType, setType] = useState(props.items[0].type);
-  const [userDoc, setDoc] = useState("");
-  const [userId, setUserId] = useState("");
+  // const [userDoc, setDoc] = useState("");
+  // const [userId, setUserId] = useState("");
 
-  const closeOnEscapeKeyDown = e => {
-    if ((e.charCode || e.keyCode) === 27) {
-      props.onClose();
-    }
-  };
+  // const closeOnEscapeKeyDown = e => {
+  //   if ((e.charCode || e.keyCode) === 27) {
+  //     props.onClose();
+  //   }
+  // };
   
   var name = props.items[0].name;
   var user_id = props.items[0].user_id;
@@ -36,12 +35,12 @@ function ModalEditUser (props) {
   var created_at = props.items[0].created_at;
   var last_login = props.items[0].last_login;
 
-  const [, setValues] = useState({
-    id: 0,
-    state: ""
-  });
+  // const [, setValues] = useState({
+  //   id: 0,
+  //   state: ""
+  // });
   
-  const inputRef = useRef()
+  // const inputRef = useRef()
   
   // const address = localStorage.getItem('wallet');
   
@@ -51,23 +50,23 @@ function ModalEditUser (props) {
   //   mensagem: ''
   // });
 
-  const handlesubmit = () => {
-    form.current.reset(); //this will reset all the inputs in the form
-  }
+  // const handlesubmit = () => {
+  //   form.current.reset(); //this will reset all the inputs in the form
+  // }
 
-  function resetForm() {
-    document.getElementById("form").reset();
-  }
+  // function resetForm() {
+  //   document.getElementById("form").reset();
+  // }
 
-  const reload = () => window.location.reload();
+  // const reload = () => window.location.reload();
   const form = useRef(null);
 
-  const onChange = (e) => {
-    setValues({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
+  // const onChange = (e) => {
+  //   setValues({
+  //     ...form,
+  //     [e.target.name]: e.target.value
+  //   });
+  // };
   
   const Toast = Swal.mixin({
     toast: true,
@@ -83,9 +82,9 @@ function ModalEditUser (props) {
 
 
   const {
-    control,
+    // control,
     handleSubmit,
-    formState: { errors },
+    // formState: { errors },
   } = useForm({
     defaultValues: {
       user_id: "",
@@ -104,9 +103,9 @@ function ModalEditUser (props) {
 
   async function submitForm(data){ 
 
-    const form = data.currentTarget;
-    var block = ""
-    var response = '';
+    // const form = data.currentTarget;
+    // var block = ""
+    // var response = '';
     var current = moment()
       .utcOffset('-03:00')
       .format('DD/MM/YYYY hh:mm:ss a');
@@ -125,7 +124,7 @@ function ModalEditUser (props) {
       "image": image
     };
 
-    response = await api.patch('account/' + user_id, block);
+      await api.patch('account/' + user_id, block);
 
       await Toast.fire({
         icon: 'success',

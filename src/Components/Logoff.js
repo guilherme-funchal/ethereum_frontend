@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
@@ -18,7 +17,7 @@ export default function Home() {
               </div>
 
               <div className="card-footer">
-                <img className="img-fluid" src="dist/img/dapp.png" width="10%" height="10%" className="center-mini"></img>
+                <img className="img-fluid" src="dist/img/dapp.png" width="10%" height="10%" alt="imagem"></img>
               </div>
             </div>
           </div>

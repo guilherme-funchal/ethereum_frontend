@@ -2,9 +2,8 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidenav from './Sidenav';
 import Api from '../Api';
-import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
 import Button from 'react-bootstrap/Button';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ModalAddProject from "./Modals/ModalAddProjeto";
 import ModalEditProject from "./Modals/ModalEditProject";
 import moment from 'moment';
@@ -13,7 +12,10 @@ import { useNavigate } from 'react-router-dom';
 import withReactContent from 'sweetalert2-react-content';
 import ModalViewProject from  "./Modals/ModalViewProject";
 
+
+
 export default function Projetos() {
+
   const Sucesso = Swal.mixin({
     toast: true,
     // position: 'center',
@@ -26,25 +28,12 @@ export default function Projetos() {
     timerProgressBar: true
   });
 
-  const Falha = Swal.mixin({
-    toast: true,
-    // position: 'center',
-    iconColor: 'falha',
-    customClass: {
-      popup: 'colored-toast'
-    },
-    showConfirmButton: false,
-    timer: 2000,
-    timerProgressBar: true
-  });
-
-  const [AprovItems, setAprovItems] = useState([' ']);
+  // const [AprovItems, setAprovItems] = useState([' ']);
   const [user, setUser] = useState([]);
   const [, updateState] = useState();
   const forceUpdate = useCallback(() => updateState({}), []);
   const [showModalAddProjeto, setShowModalAddProject] = useState(false);
   const [showModalViewProject, setShowModalViewProject] = useState(false);
-  const [showModalViewTransaction, setShowModalViewTransaction] = useState(false);
   const [showModalEditProject, setShowModalEditProject] = useState(false);
   const [modal, setModal] = useState(false);
 
@@ -70,13 +59,11 @@ export default function Projetos() {
   };
   const navigate = useNavigate();
   const [projetos, setProjetos] = useState([]);
-  const [owner, setOwner] = useState(' ');
-  const [creator, setCreator] = useState(' ');
-  const [aprov, setAprov] = useState(' ');
+  // const [owner, setOwner] = useState(' ');
+  // const [creator, setCreator] = useState(' ');
+  // const [aprov, setAprov] = useState(' ');
   const [items, setItems] = useState([' ']);
   const [itemsTransactions, setItemsTransactions] = useState([' ']);
-  const [itemsUser, setItemsUser] = useState([' ']);
-  const [showModalViewUser, setShowModalViewUser] = useState(false);
   const [taxas, setTaxas] = useState([]);
   const MySwal = withReactContent(Swal);
 
@@ -88,7 +75,7 @@ export default function Projetos() {
   const resumoProjeto = async (id) => {
     var response = await Api.get('projeto?id=' + id);
     setItems(response.data);
-    var response = await Api.get('credito?id=' + id);
+    await Api.get('credito?id=' + id);
     setItemsTransactions(response.data);
     setShowModalViewProject(true);
   }
@@ -100,7 +87,7 @@ export default function Projetos() {
 
   async function viewProjeto(id) {
     var response = await Api.get('projeto?id=' + id);
-    const link = "http://localhost:3001/upload/" + response.data[0].documentation;
+    const link = process.env.REACT_APP_REST_HOST + "/upload/" + response.data[0].documentation;
 
 
     var html =
@@ -171,7 +158,7 @@ export default function Projetos() {
       cancelButtonText: 'Não'
     }).then((result) => {
       if (result.isConfirmed) {
-        var response = Api.delete('projeto/' + id);
+        Api.delete('projeto/' + id);
 
         Toast.fire({
           icon: 'success',
@@ -183,22 +170,10 @@ export default function Projetos() {
     })
   }
 
-  async function transferCredit(account, creditAssigned) {
-
-    var block_money = {
-      "account": AprovItems[0].projectOwner,
-      "id": "1",
-      "amount": creditAssigned,
-      "data": "0x"
-    };
-    await Api.post('emitir', block_money);
-  }
-
   useEffect(() => {
     var address = localStorage.getItem('wallet');
     if (address !== null) {
       setUser(JSON.parse(address));
-      console.log(user);
       getProjetos();
       getTaxas();
     } else {
@@ -210,14 +185,14 @@ export default function Projetos() {
   async function updadateProject(id, state) {
 
     if (state === true) {
-      var state = "concluido";
+      state = "concluido";
     }
     if (state === false) {
-      var state = "rejeitado";
+      state = "rejeitado";
     }
 
     var response = await Api.get('projeto?id=' + id);
-    setAprovItems(response.data);
+    // setAprovItems(response.data);
 
     var current = moment()
       .utcOffset('-03:00')
@@ -288,15 +263,8 @@ export default function Projetos() {
         updadateProject(id, state);
       }
     })
-    // await getProjetos();
-    // await forceUpdate();
-    // if (state === "concluido") {
-    //   Swal.fire('Projeto aprovado, crédito carbono gerado!', '', 'success');
-    // }
-    // if (state === "rejeitado") {
-    //   Swal.fire('Projeto foi rejeitado!', '', 'error');
-    // }
   }
+  const style = { width: '93px' }
 
   return (
     <div>
@@ -336,114 +304,75 @@ export default function Projetos() {
                 </tr>
               </thead>
               <tbody>
-                {
-                  projetos.map((data) => {
-                    var test = true;
-                    var visible = false;
-                    var propositor = false;
-                    var certificador = false;
-                    var registrador = false;
+                {    
+                  projetos.map((data) => { 
+                      var perfil = user[0]?.profile;
+                      var state = true;
+                      var options = false;
 
-                    if (user[0]?.profile === "certificador" || user[0]?.profile === "registrador" || user[0]?.user_id === data.projectOwner || user[0]?.user_id === data.projectCreator) {
-                      visible = true;
-                    }
+                      if (user[0]?.profile === "certificador" || user[0]?.profile === "registrador") {
+                        state = false;
+                      }
 
-                    if (data.state === 'rascunho' || data.state === 'rejeitado' && user[0]?.user_id !== data.projectOwner) {
-                      visible = false;
-                    }
+                      if ((user[0]?.profile === "certificador" || user[0]?.profile === "registrador") && (data.state === 'enviado')){
+                        options = true;
+                      }
 
-                    if (data.state === 'adquirido' || data.state === 'concluido' || data.state === 'enviado' && user[0]?.profile === "propositor") {
-                      test = false;
-                    }
+                      if (user[0]?.user_id === data.projectOwner || user[0]?.user_id === data.projectCreator){
+                        state = false;
+                      }
 
-                    if (data.state === 'aposentado' && user[0]?.profile === "propositor") {
-                      test = false;
-                    }
+                      if ((user[0]?.user_id === data.projectOwner || user[0]?.user_id === data.projectCreator) && (data.state === 'rascunho' || data.state === 'rejeitado')){
+                        options = true;
+                      }
 
-                    
-                    if (data.state === 'aposentado' && user[0]?.profile === "registrador") {
-                      test = false;
-                    }
+                      if (data.id === '0')  {
+                         state = true;
+                      }
 
-                    if (data.state === 'aposentado' && user[0]?.profile === "certificador") {
-                      test = false;
-                    }
-
-                    if (user[0]?.profile === "certificador" && data.state === 'enviado') {
-                      certificador = true;
-                    }
-
-                    if (user[0]?.profile === "registrador" && data.state === 'enviado') {
-                      registrador = true;
-                    }
-
-                    if (user[0]?.profile === "propositor") {
-                      propositor = true;
-                    }
-
-                    if (user[0]?.profile === "registrador") {
-                      registrador = true;
-                    }
-
-                    const style = { width: '35px' }
-
-
-                    if (data.id !== '0') {
                       return (
+                        state ? null
+                        : (
+                                <tr  style={{ cursor: "pointer" }} key={Math.random()}>
+                                <td key={data.id} onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></td>
+                                <td key={data.name} onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
+                                <td key={data.projectOwner} onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
+                                <td key={data.projectCreator} onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></td>
+                                <td key={data.state}><center>{data.state}</center></td>
+                                <td key={data.updateDate}><center>{data.updateDate}</center></td>
 
-
-                        <If key={Math.random()} condition={visible === true}>
-                          <Then key={Math.random()}>
-
-                            <tr key={Math.random()}>
-                              <td key={data.id}><a href="#" onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></a></td>
-                              <td key={data.name}><a href="#" onClick={() => viewProjeto(data.id)}><center>{data.name}</center></a></td>
-                              <td key={data.projectOwner}><a href="#" onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></a></td>
-                              <td key={data.projectCreator}><a href="#" onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></a></td>
-                              <td key={data.state}><center>{data.state}</center></td>
-                              <td key={data.updateDate}><center>{data.updateDate}</center></td>
-                              <If key={Math.random()} condition={test === false}>
-                              <Then>  
-                              <td><center><div><Button className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualiza</Button></div></center></td>
-                              </Then>
-                              </If>
-                              <If key={Math.random()} condition={test === true}>
-                                <Then key={Math.random()}>
+                                {options === false &&
+                                <td><center><div><Button style={style} className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualiza</Button></div></center></td>
+                                }
+                                {options === true &&
+                                  <>
                                   <td key={Math.random()}><center><div>
-                                    <If key={Math.random()} condition={visible === true}>
-                                      <Then key={Math.random()}>
-                                        <If key={Math.random()} condition={propositor === true}>
-                                          <Then key={Math.random()}>
-                                            <Button className="btn btn-default" variant="primary" size="sm" name="teste" onClick={() => editProjeto(data.id)}><i class="fas fa-edit"></i> Edita</Button>
-                                            <Button className="btn btn-default" variant="danger" size="sm" onClick={() => delProjeto(data.id)}><i class="fas fa-eraser"></i> Exclui</Button>
-                                          </Then>
-                                        </If>
-                                        <If key={Math.random()} condition={certificador === true}>
-                                          <Then key={Math.random()}>
-                                            <Button className="btn btn-default"  variant="primary" size="sm" onClick={() => finalizarProjeto(data.id, true)}><i class="fas fa-check"></i> Aprova</Button>
-                                            <Button className="btn btn-default" variant="danger" size="sm" onClick={() => finalizarProjeto(data.id, false)}><i class="fas fa-eraser"></i> Rejeita</Button>
-                                          </Then>
-                                        </If>
-                                        <If key={Math.random()} condition={registrador === true}>
-                                          <Then key={Math.random()}>
-                                            {/* <Button style={style} className="btn btn-default" rounded variant="primary" size="sm" name="teste" onClick={() => editProjeto(data.id)}>Editar</Button>
-                                          <Button style={style} className="btn btn-default" rounded variant="danger" size="sm" onClick={() => delProjeto(data.id)}>Excluir</Button> */}
-                                            <Button className="btn btn-default" variant="success" size="sm" onClick={() => finalizarProjeto(data.id, true)}><i class="fas fa-check"></i> Aprova</Button>
-                                            <Button className="btn btn-default" variant="danger" size="sm" onClick={() => finalizarProjeto(data.id, false)}><i class="fas fa-eraser"></i> Rejeita</Button>
-                                          </Then>
-                                        </If>
-                                        
-                                      </Then>
-                                    </If>
-                                  </div></center></td>
-                                </Then>
-                              </If>
-                            </tr>
-                          </Then>
-                        </If>
-
-                      );
-                    }
+                                      <>
+                                          {perfil === "propositor" &&
+                                          <>
+                                                <Button style={style} className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualiza</Button>
+                                                <Button style={style} className="btn btn-default" variant="primary" size="sm" name="teste" onClick={() => editProjeto(data.id)}><i class="fas fa-edit"></i> Edita</Button>
+                                                <Button style={style} className="btn btn-default" variant="danger" size="sm" onClick={() => delProjeto(data.id)}><i class="fas fa-eraser"></i> Exclui</Button>
+                                          </>
+                                          }
+                                          {perfil === "certificador" &&
+                                          <>
+                                                <Button style={style} className="btn btn-default"  variant="primary" size="sm" onClick={() => finalizarProjeto(data.id, true)}><i class="fas fa-check"></i> Aprova</Button>
+                                                <Button style={style} className="btn btn-default" variant="danger" size="sm" onClick={() => finalizarProjeto(data.id, false)}><i class="fas fa-eraser"></i> Rejeita</Button>
+                                                <Button style={style} className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualiza</Button>
+                                          </>
+                                          }
+                                          {perfil === "registrador" &&
+                                            <>
+                                               <td><center><div><Button style={style} className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualiza</Button></div></center></td>
+                                            </>
+                                          }
+                                      </>    
+                                    </div></center></td>
+                                  </>
+                                }
+                            </tr>   
+                      ));
                   })}
 
               </tbody>
@@ -451,7 +380,7 @@ export default function Projetos() {
 
             <ModalAddProject setShowModalAddProject={setShowModalAddProject} toggle={toggle} keyboard={false} projectOwner={user[0]?.user_id} backdrop={"static"} title="Adicionar projeto" onClose={() => { setShowModalAddProject(false); getProjetos(); forceUpdate(); setItems(' '); }} show={showModalAddProjeto} />
             <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => { getProjetos(); forceUpdate(); setShowModalEditProject(false); setItems(' '); }} show={showModalEditProject} />
-            <ModalViewProject  owner={owner} creator={creator} aprov={aprov} items={items} itemsTransactions={itemsTransactions} setShowModalViewProject={setShowModalViewProject} onClose={() => setShowModalViewProject(false)} show={showModalViewProject}/>
+            <ModalViewProject  items={items} itemsTransactions={itemsTransactions} setShowModalViewProject={setShowModalViewProject} onClose={() => setShowModalViewProject(false)} show={showModalViewProject}/>
           </div>
         </section>
 

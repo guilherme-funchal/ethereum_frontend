@@ -1,59 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
-import { Form, Button, Row, Col } from "react-bootstrap";
+import { Form, Button, Col } from "react-bootstrap";
 import Api from '../../Api';
 import { Controller, useForm } from "react-hook-form";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from "moment";
-import { useNavigate } from 'react-router-dom';
 
 function ModalAddProjeto (props) {
 
-  const closeOnEscapeKeyDown = e => {
-    if ((e.charCode || e.keyCode) === 27) {
-      props.onClose();
-    }
-  };
-
-  const navigate = useNavigate();
-
-  const [, setValues] = useState({
-    id: 0,
-    state: ""
-  });
   
-  const inputRef = useRef()
-  
-  const [state, setState] = useState("");
-  const [projectName, setName] = useState("");
-
-  const [projectDescription, setDescription] = useState("");
-  const [projectArea, setArea] = useState("");
-
+  const [state, setState] = useState("rascunho");
   const [file, setFile] = useState('');
-  const [status, setStatus] = useState({
-    type: '',
-    mensagem: ''
-  });
-
-  const handlesubmit = () => {
-    form.current.reset(); //this will reset all the inputs in the form
-  }
-
-  function resetForm() {
-    document.getElementById("form").reset();
-  }
-
-  const reload = () => window.location.reload();
   const form = useRef(null);
 
-  const onChange = (e) => {
-    setValues({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
 
   const {
     control,
@@ -78,9 +38,8 @@ function ModalAddProjeto (props) {
   });
 
   async function submitForm(data){  
-    const form = data.currentTarget;
+    // const form = data.currentTarget;
     var block = ""
-    var response = '';
     var current = moment()
       .utcOffset('-03:00')
       .format('DD/MM/YYYY hh:mm:ss a');
@@ -93,8 +52,7 @@ function ModalAddProjeto (props) {
         'Content-Type': 'multipart/form-data'
       }
     }
-   
-   
+      
 
     var transactions_result = await Api.post("/upload", formdata, headers);
 
@@ -112,11 +70,11 @@ function ModalAddProjeto (props) {
       "updateDate": String(current)
     };
 
-    response = await Api.post('/projeto', block);
+    await Api.post('/projeto', block);
     props.onClose();
-    navigate(0);
+    //navigate(0);
   }
-
+const style = { width: '85px' }
 
 return ReactDOM.createPortal(
   <CSSTransition
@@ -144,7 +102,7 @@ return ReactDOM.createPortal(
               <Controller
                 name="name"
                 control={control}
-                onChange={(e) => setName(e.target.value)}
+                // onChange={(e) => setName(e.target.value)}
                 rules={{ required: true }}
                 render={({ field }) => (
                   <Form.Control
@@ -168,7 +126,7 @@ return ReactDOM.createPortal(
               <Controller
                 name="description"
                 control={control}
-                onChange={(e) => setDescription(e.target.value)}
+                // onChange={(e) => setDescription(e.target.value)}
                 rules={{ required: true }}
                 render={({ field }) => (
                   <Form.Control
@@ -197,7 +155,7 @@ return ReactDOM.createPortal(
               <Controller
                 name="area"
                 control={control}
-                onChange={(e) => setArea(e.target.value)}
+                // onChange={(e) => setArea(e.target.value)}
                 rules={{ required: true }}
                 render={({ field }) => (
                   <Form.Control
@@ -218,10 +176,10 @@ return ReactDOM.createPortal(
             </Form.Group>
             <br></br>
             <div className="text-right">
-              <Button variant="danger" onClick={props.onClose} size="sm">
+              <Button style={style} variant="danger" onClick={props.onClose} size="sm">
               <i class="fas fa-ban"></i> Cancela
               </Button>
-              <Button variant="primary" type="submit" size="sm">
+              <Button style={style} variant="primary" type="submit" size="sm">
               <i class="fas fa-check"></i> Salvar
               </Button>
             </div>

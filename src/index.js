@@ -10,6 +10,7 @@ import Tokens from './Components/Tokens';
 import Transfer from './Components/Transfer';
 import Dashboard from './Components/Dashboard';
 import Logoff from './Components/Logoff';
+import Erro from './Components/Erro';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -25,6 +26,7 @@ root.render(
           <Route key="Dashboard" path="/Dashboard" element={<Dashboard />} />
           <Route key="Projetos" path="/Projetos" element={<Projetos />}  />
           <Route key="logoff" path="/logoff" element={<Logoff />}  />
+          <Route key="Erro" path="/Erro" element={<Erro />}  />
         </Routes>
     </Router>
     

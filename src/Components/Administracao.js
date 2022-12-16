@@ -2,25 +2,16 @@ import Header from './Header';
 import Footer from './Footer';
 import Sidenav from './Sidenav';
 import Api from '../Api';
-import TableUsers from './Tables/TableUsers';
 import Swal from 'sweetalert2';
 import { Button } from 'react-bootstrap/';
 import { useState, useEffect, useCallback } from 'react';
 import ModalAddUser from './Modals/ModalAddUser';
 import ModalEditUser from './Modals/ModalEditUser';
-import Modal1 from './Modals/Modal1';
 import './../App.css';
-import { If, Then, ElseIf, Else } from 'react-if-elseif-else-render';
+import './Modals/Modal.css';
+
 
 export default function Administracao() {
-    const column_tratamento = [
-        { heading: 'User ID', value: 'user_id' },
-        { heading: 'Perfil', value: 'profile' },
-        { heading: 'Nome', value: 'name' },
-        { heading: 'Email', value: 'email' },
-        { heading: 'Tipo', value: 'type' },
-    ]
-
     async function viewUser(user_id) {
         var response = await Api.get('account/find/' + user_id);
         Swal.fire({
@@ -75,7 +66,7 @@ export default function Administracao() {
             cancelButtonText: 'Não'
         }).then((result) => {
             if (result.isConfirmed) {
-                var response = Api.delete('account/' + user_id);
+                Api.delete('account/' + user_id);
                 Toast.fire({
                     icon: 'success',
                     title: 'Usuário excluído'
@@ -83,7 +74,7 @@ export default function Administracao() {
                 const block = {
                     "user_id": user_id
                 };
-                const response_add = Api.post('account-lists/add', block);
+                Api.post('account-lists/add', block);
             }
             getUsers();
             forceUpdate();
@@ -114,7 +105,7 @@ export default function Administracao() {
             "moeda": moeda 
           };
     
-          var response = await Api.patch('tax/' + 1, block);
+          await Api.patch('tax/' + 1, block);
           Swal.fire(`Valor do carbono : ${carbono}`);
           taxas.carbono = carbono;
           forceUpdate();
@@ -137,7 +128,7 @@ export default function Administracao() {
             "carbono": carbono,
             "moeda": moeda 
           };
-          var response = await Api.patch('tax/' + 1, block);
+          await Api.patch('tax/' + 1, block);
           Swal.fire(`Valor da moeda : ${moeda}`);
           taxas.moeda = moeda;
           forceUpdate();
@@ -184,18 +175,17 @@ export default function Administracao() {
                             </thead>
 
                             {users.map((data) => {
-                                var visible = true;
-                                const style = { width: '30px' }
+                                var visible = false;
                                 if (data.user_id === "0x0000000000000000000000000000000000000000"){
-                                    visible = false;
+                                    visible = true;
                                 }
                                 return (
-                                    <If condition={visible === true}>
-                                    <Then>
+                                    visible ? null
+                                    : (
                                     <tr> 
                                     <td><center>{data.name}</center></td>
                                     <td><center>{data.email}</center></td>
-                                    <td key={data.user_id}><a href="#" onClick={() => viewUser(data.user_id)}><center>{data.user_id}</center></a></td> 
+                                    <td style={{ cursor: "pointer" }} key={data.user_id} onClick={() => viewUser(data.user_id)}><center>{data.user_id}</center></td> 
                                     <td><center>{data.profile}</center></td>
                                     {/* <td><center>{data.type}</center></td> */}
                                     <td><center> <div>
@@ -208,8 +198,7 @@ export default function Administracao() {
                                     </div>
                                     </center></td>
                                     </tr>
-                                    </Then>
-                                    </If> 
+                                    )
                                 );
                             })}
                             <tbody>
@@ -236,7 +225,7 @@ export default function Administracao() {
                                     <div className="icon">
                                         <i className="ion ion-bag"></i>
                                     </div>
-                                    <a href="#" className="small-box-footer" onClick={() => editCarbono()}>Alterar <i className="fas fa-arrow-circle-right"></i></a>
+                                    <div className="small-box-footer" onClick={() => editCarbono()}>Alterar <i className="fas fa-arrow-circle-right"></i></div>
                                 </div>
                             </div>
                             <div className="col-lg-5 col-8">
@@ -248,7 +237,7 @@ export default function Administracao() {
                                     <div className="icon">
                                         <i className="ion ion-bag"></i>
                                     </div>
-                                    <a href="#" className="small-box-footer" onClick={() => editMoeda()}>Alterar <i className="fas fa-arrow-circle-right"></i></a>
+                                    <div className="small-box-footer" onClick={() => editMoeda()}>Alterar <i className="fas fa-arrow-circle-right"></i></div>
                                 </div>
                             </div>
                         </div>
