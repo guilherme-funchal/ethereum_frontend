@@ -52,7 +52,6 @@ function ModalAddProjeto (props) {
         'Content-Type': 'multipart/form-data'
       }
     }
-      
 
     var transactions_result = await Api.post("/upload", formdata, headers);
 
@@ -89,14 +88,14 @@ return ReactDOM.createPortal(
         </div>
         <div className="modal-body">
           <form ref={form} noValidate onSubmit={handleSubmit(submitForm)}>
-          <Form.Group as={Col} md="20" controlId="validationCustom01">
+            <Form.Group as={Col} md="20" controlId="validationCustom01">
                 <Form.Label>Estado</Form.Label><br></br>
                 <select name="state" value={state} onChange={state => setState(state.target.value)}>
-                  <option value="rascunho">Selecione um tipo</option>
+                  <option value="rascunho">Selecione um estado</option>
                   <option value="rascunho">Rascunho</option>
                   <option value="enviado">Concluído</option>
                 </select><br /><br />
-              </Form.Group>  
+            </Form.Group>  
             <Form.Group as={Col} md="20" controlId="validationCustom01">
               <Form.Label>Nome</Form.Label>
               <Controller

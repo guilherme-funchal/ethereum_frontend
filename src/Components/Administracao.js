@@ -7,7 +7,7 @@ import { Button } from 'react-bootstrap/';
 import { useState, useEffect, useCallback } from 'react';
 import ModalAddUser from './Modals/ModalAddUser';
 import ModalEditUser from './Modals/ModalEditUser';
-import './../App.css';
+// import './../App.css';
 import './Modals/Modal.css';
 
 
@@ -30,6 +30,11 @@ export default function Administracao() {
     const getTaxas = async () => {
         const response = await Api.get('tax/list');
         setTaxas(response.data);
+    };
+    const [modal, setModal] = useState(false);
+
+    const toggle = () => {
+        setModal(!modal);
     };
 
     const Toast = Swal.mixin({
@@ -141,6 +146,8 @@ export default function Administracao() {
         getTaxas();
     }, []);
 
+    const style = { width: '93px' }
+
     return (
         <div>
             <Header />
@@ -159,18 +166,20 @@ export default function Administracao() {
                 </div>
                 <section className="content">
                     <div className="container-fluid">
-                        <Button variant="primary" size="sm" onClick={() => setShowModalAddUser(true)}>
-                        <i class="fas fa-user"></i> Novo
+                        <Button style={style} variant="primary" size="sm" onClick={() => setShowModalAddUser(true)}>
+                        <i class="fas fa-plus"></i> Novo
                         </Button>
+                        <div style={{ "font-size": "15px" }} class="table-responsive">
+                        {/* <table class="table-sm table-striped table-bordered  w-100 d-block d-md-table"> */}
                         <table className="blueTable">
                             <thead>
                                 <tr>
-                                    <th><center>Nome</center></th>
-                                    <th><center>Email</center></th>
-                                    <th><center>User ID</center></th>
-                                    <th><center>Perfil</center></th>
+                                    <th class="bg-primary"><center>Nome</center></th>
+                                    <th class="bg-primary"><center>Email</center></th>
+                                    <th class="bg-primary"><center>User ID</center></th>
+                                    <th class="bg-primary"><center>Perfil</center></th>
                                     {/* <th><center>Tipo</center></th> */}
-                                    <th><center>Operação</center></th>
+                                    <th class="bg-primary"><center>Operação</center></th>
                                 </tr>
                             </thead>
 
@@ -188,14 +197,13 @@ export default function Administracao() {
                                     <td style={{ cursor: "pointer" }} key={data.user_id} onClick={() => viewUser(data.user_id)}><center>{data.user_id}</center></td> 
                                     <td><center>{data.profile}</center></td>
                                     {/* <td><center>{data.type}</center></td> */}
-                                    <td><center> <div>
-                                        <Button className="btn btn-default" variant="primary" size="sm" onClick={() => editUser(data.user_id)}>
+                                    <td><center>
+                                        <Button style={style} className="btn btn-default" variant="primary" size="sm" onClick={() => editUser(data.user_id)}>
                                         <i class="fas fa-pen"> Edita</i> 
                                         </Button>
-                                        <Button className="btn btn-default" variant="danger" size="sm" onClick={() => delUsuario(data.user_id)}>
+                                        <Button style={style} className="btn btn-default" variant="danger" size="sm" onClick={() => delUsuario(data.user_id)}>
                                         <i class="fas fa-trash"> Exclui</i> 
                                         </Button>
-                                    </div>
                                     </center></td>
                                     </tr>
                                     )
@@ -204,6 +212,7 @@ export default function Administracao() {
                             <tbody>
                             </tbody>
                         </table>
+                    </div>
                     </div>
                 </section>
                 <div><br></br></div>
@@ -245,9 +254,10 @@ export default function Administracao() {
                 </div>
                 {/* /.content */}
             </div>
-            <ModalAddUser onClose={() => { getUsers(); forceUpdate(); setShowModalAddUser(false); setItems(' '); }} show={showModalAddUser}></ModalAddUser>
-            <ModalEditUser items={items} onClose={() => { getUsers(); forceUpdate(); setShowModalEditUser(false); setItems(' '); }} show={showModalEditUser}></ModalEditUser>
-
+            <ModalAddUser onClose={() => { getUsers(); forceUpdate(); setShowModalAddUser(false); setItems(' '); }} show={showModalAddUser} backdrop={"static"} toggle={toggle} keyboard={false}></ModalAddUser>
+            <ModalEditUser items={items} onClose={() => { getUsers(); forceUpdate(); setShowModalEditUser(false); setItems(' '); }} show={showModalEditUser} toggle={toggle} keyboard={false}></ModalEditUser>
+            
+  
             {/* /.content-wrapper */}
             <Footer />
         </div>

@@ -159,6 +159,7 @@ export default function Transfer() {
         }   
     }, [navigate])
 
+    const style = { width: '93px' }
     
     return (
         <div>
@@ -178,19 +179,21 @@ export default function Transfer() {
                 </div>
                 <section className="content">
                     <div className="container-fluid">
-                        <Button variant="primary" size="sm" onClick={doTransfer}>
+                        <Button style={style} variant="primary" size="sm" onClick={doTransfer}>
                         <i class="fas fa-plus"></i> Nova
                         </Button>
-                        <table className="blueTable">
+                        <div style={{ "font-size": "15px" }} class="table-responsive">
+                        {/* <table class="table-sm table-striped table-bordered  w-100 d-block d-md-table"> */}
+                        <table className="blueTable">    
                             <thead>
                                 <tr>
-                                    <th><center>Evento</center></th>
-                                    <th><center>Bloco</center></th>
-                                    <th><center>Origem</center></th>
-                                    <th><center>Destino</center></th>
-                                    <th><center>Valor</center></th>
-                                    <th><center>Tipo</center></th>
-                                    <th><center>Timestamp</center></th>
+                                    <th class="bg-primary"><center>Evento</center></th>
+                                    <th class="bg-primary"><center>Bloco</center></th>
+                                    <th class="bg-primary"><center>Origem</center></th>
+                                    <th class="bg-primary"><center>Destino</center></th>
+                                    <th class="bg-primary"><center>Valor</center></th>
+                                    <th class="bg-primary"><center>Tipo</center></th>
+                                    <th class="bg-primary"><center>Timestamp</center></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -270,6 +273,7 @@ export default function Transfer() {
                                 })}
                             </tbody>
                         </table>
+                        </div>
                     </div>{/* /.container-fluid */}
                 </section>
                 {/* /.content */}

@@ -13,7 +13,6 @@ import withReactContent from 'sweetalert2-react-content';
 import ModalViewProject from  "./Modals/ModalViewProject";
 
 
-
 export default function Projetos() {
 
   const Sucesso = Swal.mixin({
@@ -284,23 +283,26 @@ export default function Projetos() {
         </div>
         <section className="content">
           <div className="container-fluid">
-          <Button variant="primary" size="sm" onClick={() => setShowModalAddProject(true)}>
+          <Button style={style} variant="primary" size="sm" onClick={() => setShowModalAddProject(true)}>
             <i class="fas fa-plus"></i> Novo
             </Button>
-            <table className="blueTable">
+            {/* <table className="blueTable"> */}
+            <div style={{ "font-size": "15px" }} class="table-responsive">
+            {/* <table class="table-sm table-striped table-bordered  w-100 d-block d-md-table"> */}
+              <table className="blueTable">
               <thead>
                 <tr>
-                  <th><center>Projeto ID</center></th>
-                  <th><center>Nome do projeto</center></th>
-                  <th><center>Proprietário</center></th>
-                  <th><center>Criador</center></th>
-                  <th><center>Estado</center></th>
+                  <th class="bg-primary"><center>Projeto ID</center></th>
+                  <th class="bg-primary"><center>Nome do projeto</center></th>
+                  <th class="bg-primary"><center>Proprietário</center></th>
+                  <th class="bg-primary"><center>Criador</center></th>
+                  <th class="bg-primary"><center>Estado</center></th>
                   {/* <th><center>Area</center></th>
                   <th><center>Valor</center></th> */}
                   {/* <th><center>Data criação</center></th> */}
                   {/* <th><center>Aposentado</center></th> */}
-                  <th><center>Data atualização</center></th>
-                  <th><center>Operações</center></th>
+                  <th class="bg-primary"><center>Data atualização</center></th>
+                  <th class="bg-primary"><center>Operações</center></th>
                 </tr>
               </thead>
               <tbody>
@@ -310,8 +312,13 @@ export default function Projetos() {
                       var state = true;
                       var options = false;
 
+
                       if (user[0]?.profile === "certificador" || user[0]?.profile === "registrador") {
-                        state = false;
+                        if (data.state === 'rascunho' || data.state === 'rejeitado') {
+                          state = true;
+                        } else {
+                          state = false;
+                        } 
                       }
 
                       if ((user[0]?.profile === "certificador" || user[0]?.profile === "registrador") && (data.state === 'enviado')){
@@ -333,13 +340,13 @@ export default function Projetos() {
                       return (
                         state ? null
                         : (
-                                <tr  style={{ cursor: "pointer" }} key={Math.random()}>
-                                <td key={data.id} onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></td>
-                                <td key={data.name} onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
-                                <td key={data.projectOwner} onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
-                                <td key={data.projectCreator} onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></td>
-                                <td key={data.state}><center>{data.state}</center></td>
-                                <td key={data.updateDate}><center>{data.updateDate}</center></td>
+                                <tr  key={Math.random()}>
+                                <td  style={{ cursor: "pointer" }} key={data.id} onClick={() => ViewTransaction(data.id)}><center>{data.id}</center></td>
+                                <td  style={{ cursor: "pointer" }} key={data.name} onClick={() => viewProjeto(data.id)}><center>{data.name}</center></td>
+                                <td  style={{ cursor: "pointer" }} key={data.projectOwner} onClick={() => viewUser(data.projectOwner)}><center>{data.projectOwner}</center></td>
+                                <td  style={{ cursor: "pointer" }} key={data.projectCreator} onClick={() => viewUser(data.projectCreator)}><center>{data.projectCreator}</center></td>
+                                <td  style={{ cursor: "pointer" }} key={data.state}><center>{data.state}</center></td>
+                                <td  style={{ cursor: "pointer" }} key={data.updateDate}><center>{data.updateDate}</center></td>
 
                                 {options === false &&
                                 <td><center><div><Button style={style} className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualiza</Button></div></center></td>
@@ -364,7 +371,7 @@ export default function Projetos() {
                                           }
                                           {perfil === "registrador" &&
                                             <>
-                                               <td><center><div><Button style={style} className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualiza</Button></div></center></td>
+                                                <Button style={style} className="btn btn-default" variant="success" size="sm" onClick={() => resumoProjeto(data.id)}><i class="fas fa-glasses"></i> Visualiza</Button>
                                             </>
                                           }
                                       </>    
@@ -377,7 +384,7 @@ export default function Projetos() {
 
               </tbody>
             </table>
-
+            </div>
             <ModalAddProject setShowModalAddProject={setShowModalAddProject} toggle={toggle} keyboard={false} projectOwner={user[0]?.user_id} backdrop={"static"} title="Adicionar projeto" onClose={() => { setShowModalAddProject(false); getProjetos(); forceUpdate(); setItems(' '); }} show={showModalAddProjeto} />
             <ModalEditProject toggle={toggle} keyboard={false} backdrop={"static"} title="Editar dados do projeto" items={items} onClose={() => { getProjetos(); forceUpdate(); setShowModalEditProject(false); setItems(' '); }} show={showModalEditProject} />
             <ModalViewProject  items={items} itemsTransactions={itemsTransactions} setShowModalViewProject={setShowModalViewProject} onClose={() => setShowModalViewProject(false)} show={showModalViewProject}/>
@@ -386,7 +393,7 @@ export default function Projetos() {
 
       </div>
 
-      <Footer key="footer" />
+      <Footer/>
     </div>
   )
 }

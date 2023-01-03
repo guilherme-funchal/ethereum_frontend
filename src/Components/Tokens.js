@@ -200,6 +200,7 @@ export default function Tokens() {
 
     }, [navigate])
 
+    const style = { width: '98px' }
 
     return (
         <div>
@@ -219,22 +220,24 @@ export default function Tokens() {
                 </div>
                 <section className="content">
                     <div className="container-fluid">
-                        <Button variant="primary" size="sm" onClick={doTokem}>
+                        <Button style={style} variant="primary" size="sm" onClick={doTokem}>
                         <i class="fas fa-stamp"></i> Emitir
                         </Button>
-                        <Button variant="danger" size="sm"  onClick={burnTokem}>
+                        <Button  style={style} variant="danger" size="sm"  onClick={burnTokem}>
                         <i class="fas fa-fire"></i> Aposentar
                         </Button>
+                        <div style={{ "font-size": "15px" }} class="table-responsive">
                         <table className="blueTable">
+                        {/* <table class="table-sm table-striped table-bordered  w-100 d-block d-md-table"> */}
                             <thead>
                                 <tr>
-                                    <th><center>Evento</center></th>
-                                    <th><center>Bloco</center></th>
-                                    <th><center>Origem</center></th>
-                                    <th><center>Destino</center></th>
-                                    <th><center>Valor</center></th>
-                                    <th><center>Tipo</center></th>
-                                    <th><center>Timestamp</center></th>
+                                    <th class="bg-primary"><center>Evento</center></th>
+                                    <th class="bg-primary"><center>Bloco</center></th>
+                                    <th class="bg-primary"><center>Origem</center></th>
+                                    <th class="bg-primary"><center>Destino</center></th>
+                                    <th class="bg-primary"><center>Valor</center></th>
+                                    <th class="bg-primary"><center>Tipo</center></th>
+                                    <th class="bg-primary"><center>Timestamp</center></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -299,6 +302,7 @@ export default function Tokens() {
                                 })}
                             </tbody>
                         </table>
+                        </div>
                     </div>{/* /.container-fluid */}
                 </section>
                 {/* /.content */}
